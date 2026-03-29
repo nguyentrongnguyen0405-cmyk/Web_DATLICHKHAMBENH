@@ -1,9 +1,302 @@
-﻿@{
-    ViewData["Title"] = "Trang chủ";
-}
-
-<div class="text-center">
-    <h1 class="display-4">Chào mừng đến với Phòng khám trực tuyến</h1>
-    <p>Đặt lịch khám dễ dàng, nhanh chóng và tiện lợi.</p>
-    <a asp-controller="Appointments" asp-action="Create" class="btn btn-primary btn-lg mt-3">Đặt lịch ngay</a>
+﻿<!-- Slider hiện đại, nền sáng -->
+<div id="mainSlider" class="carousel slide carousel-fade" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#mainSlider" data-bs-slide-to="0" class="active"></button>
+        <button type="button" data-bs-target="#mainSlider" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#mainSlider" data-bs-slide-to="2"></button>
+    </div>
+    <div class="carousel-inner">
+        <!-- Slide 1 -->
+        <div class="carousel-item active">
+            <div class="container py-5">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 text-start">
+                        <h1 class="display-4 fw-bold text-dark">Xét nghiệm chính xác - Kết quả nhanh</h1>
+                        <p class="lead text-secondary">Hệ thống đạt chuẩn ISO 15189, công nghệ hiện đại</p>
+                        <div class="mt-4">
+                            <a asp-controller="Appointments" asp-action="Create" class="btn btn-primary btn-lg me-3 px-4">📅 Đặt lịch hẹn</a>
+                            <a href="#services" class="btn btn-outline-primary btn-lg px-4">🔍 Khám phá dịch vụ</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 text-center">
+                        <img src="/images/slider/slide1.webp" alt="Slide 1" class="img-fluid rounded shadow">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Slide 2 -->
+        <div class="carousel-item">
+            <div class="container py-5">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 text-start">
+                        <h1 class="display-4 fw-bold text-dark">Đội ngũ bác sĩ chuyên môn cao</h1>
+                        <p class="lead text-secondary">Tận tâm, giàu kinh nghiệm, luôn đồng hành cùng sức khỏe của bạn</p>
+                        <div class="mt-4">
+                            <a asp-controller="Appointments" asp-action="Create" class="btn btn-primary btn-lg me-3 px-4">📅 Đặt lịch hẹn</a>
+                            <a href="#services" class="btn btn-outline-primary btn-lg px-4">🔍 Khám phá dịch vụ</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 text-center">
+                        <img src="/images/slider/slide2.webp" alt="Slide 2" class="img-fluid rounded shadow">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Slide 3 -->
+        <div class="carousel-item">
+            <div class="container py-5">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 text-start">
+                        <h1 class="display-4 fw-bold text-dark">Phòng khám & Xét nghiệm DIAG</h1>
+                        <p class="lead text-secondary">Chăm sóc sức khỏe toàn diện - Kết quả nhanh chóng - Tận tâm vì bạn</p>
+                        <div class="mt-4">
+                            <a asp-controller="Appointments" asp-action="Create" class="btn btn-primary btn-lg me-3 px-4">📅 Đặt lịch hẹn</a>
+                            <a href="#services" class="btn btn-outline-primary btn-lg px-4">🔍 Khám phá dịch vụ</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 text-center">
+                        <img src="/images/slider/slide3.webp" alt="Slide 3" class="img-fluid rounded shadow">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#mainSlider" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#mainSlider" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
 </div>
+<!-- Dịch vụ nổi bật -->
+<section id="services" class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">🌟 Dịch vụ nổi bật</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-stethoscope fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Khám tổng quát</h5>
+                        <p class="card-text">Kiểm tra sức khỏe toàn diện, phát hiện sớm bệnh lý</p>
+                        <span class="badge bg-primary mb-2 d-inline-block">500.000đ</span>
+                        <div>
+                            <a asp-controller="Home" asp-action="ServiceDetail" asp-route-id="kham-tong-quat" class="btn btn-primary btn-sm">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-child fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Nhi khoa</h5>
+                        <p class="card-text">Chăm sóc sức khỏe trẻ em, tiêm chủng, dinh dưỡng</p>
+                        <span class="badge bg-primary mb-2 d-inline-block">400.000đ</span>
+                        <div>
+                            <a asp-controller="Home" asp-action="ServiceDetail" asp-route-id="nhi-khoa" class="btn btn-primary btn-sm">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-tooth fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Răng hàm mặt</h5>
+                        <p class="card-text">Nhổ răng, trám răng, tẩy trắng, niềng răng</p>
+                        <span class="badge bg-primary mb-2 d-inline-block">600.000đ</span>
+                        <div>
+                            <a asp-controller="Home" asp-action="ServiceDetail" asp-route-id="rang-ham-mat" class="btn btn-primary btn-sm">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-heartbeat fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Tim mạch</h5>
+                        <p class="card-text">Khám và điều trị bệnh tim mạch, cao huyết áp</p>
+                        <span class="badge bg-primary mb-2 d-inline-block">700.000đ</span>
+                        <div>
+                            <a asp-controller="Home" asp-action="ServiceDetail" asp-route-id="tim-mach" class="btn btn-primary btn-sm">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-flask fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Xét nghiệm</h5>
+                        <p class="card-text">Xét nghiệm máu, nước tiểu, chẩn đoán hình ảnh</p>
+                        <span class="badge bg-primary mb-2 d-inline-block">300.000đ</span>
+                        <div>
+                            <a asp-controller="Home" asp-action="ServiceDetail" asp-route-id="xet-nghiem" class="btn btn-primary btn-sm">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-notes-medical fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Tải lên phiếu chỉ định</h5>
+                        <p class="card-text">Tải lên phiếu xét nghiệm, nhận kết quả nhanh</p>
+                        <span class="badge bg-success mb-2 d-inline-block">Miễn phí</span>
+                        <div>
+                            <a asp-controller="Home" asp-action="ServiceDetail" asp-route-id="xet-nghiem-std" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 40+ Gói xét nghiệm -->
+<section class="bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">🔬 40+ Gói xét nghiệm chuyên sâu</h2>
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <div class="p-3 bg-white rounded shadow-sm text-center h-100">
+                    <i class="fas fa-tint fa-2x text-primary mb-2"></i>
+                    <p class="mb-1 fw-bold">Xét nghiệm máu</p>
+                    <small class="text-muted">Tổng phân tích</small>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="p-3 bg-white rounded shadow-sm text-center h-100">
+                    <i class="fas fa-lungs fa-2x text-primary mb-2"></i>
+                    <p class="mb-1 fw-bold">Chức năng hô hấp</p>
+                    <small class="text-muted">Đo chức năng phổi</small>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="p-3 bg-white rounded shadow-sm text-center h-100">
+                    <i class="fas fa-liver fa-2x text-primary mb-2"></i>
+                    <p class="mb-1 fw-bold">Chức năng gan</p>
+                    <small class="text-muted">AST, ALT, GGT</small>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="p-3 bg-white rounded shadow-sm text-center h-100">
+                    <i class="fas fa-kidneys fa-2x text-primary mb-2"></i>
+                    <p class="mb-1 fw-bold">Chức năng thận</p>
+                    <small class="text-muted">Creatinine, Ure</small>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="p-3 bg-white rounded shadow-sm text-center h-100">
+                    <i class="fas fa-heartbeat fa-2x text-primary mb-2"></i>
+                    <p class="mb-1 fw-bold">Men tim</p>
+                    <small class="text-muted">CK-MB, Troponin</small>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="p-3 bg-white rounded shadow-sm text-center h-100">
+                    <i class="fas fa-virus fa-2x text-primary mb-2"></i>
+                    <p class="mb-1 fw-bold">Viêm gan B, C</p>
+                    <small class="text-muted">HBsAg, Anti-HCV</small>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="p-3 bg-white rounded shadow-sm text-center h-100">
+                    <i class="fas fa-dna fa-2x text-primary mb-2"></i>
+                    <p class="mb-1 fw-bold">Xét nghiệm HPV</p>
+                    <small class="text-muted">Phát hiện sớm ung thư</small>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="p-3 bg-white rounded shadow-sm text-center h-100">
+                    <i class="fas fa-apple-alt fa-2x text-primary mb-2"></i>
+                    <p class="mb-1 fw-bold">Đường huyết</p>
+                    <small class="text-muted">HbA1c, Glucose</small>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <a asp-controller="Appointments" asp-action="Create" class="btn btn-primary btn-lg">
+                📅 Đặt lịch xét nghiệm ngay
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Bác sĩ tiêu biểu -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">👨‍⚕️ Đội ngũ bác sĩ tiêu biểu</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card text-center shadow-sm h-100">
+                    <div class="card-body">
+                        <i class="fas fa-user-md fa-4x text-primary mb-3"></i>
+                        <h5 class="card-title">PGS.TS.BS Nguyễn Văn An</h5>
+                        <p class="card-text text-muted">Nội tổng quát</p>
+                        <span class="badge bg-success mb-3 d-inline-block">15 năm kinh nghiệm</span>
+                        <div>
+                            <a asp-controller="Appointments" asp-action="Create" class="btn btn-primary btn-sm">Đặt lịch</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card text-center shadow-sm h-100">
+                    <div class="card-body">
+                        <i class="fas fa-user-md fa-4x text-primary mb-3"></i>
+                        <h5 class="card-title">TS.BS Trần Thị Bích</h5>
+                        <p class="card-text text-muted">Nhi khoa</p>
+                        <span class="badge bg-success mb-3 d-inline-block">12 năm kinh nghiệm</span>
+                        <div>
+                            <a asp-controller="Appointments" asp-action="Create" class="btn btn-primary btn-sm">Đặt lịch</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card text-center shadow-sm h-100">
+                    <div class="card-body">
+                        <i class="fas fa-user-md fa-4x text-primary mb-3"></i>
+                        <h5 class="card-title">BS.CKII Lê Văn Cường</h5>
+                        <p class="card-text text-muted">Răng hàm mặt</p>
+                        <span class="badge bg-success mb-3 d-inline-block">10 năm kinh nghiệm</span>
+                        <div>
+                            <a asp-controller="Appointments" asp-action="Create" class="btn btn-primary btn-sm">Đặt lịch</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Đăng ký tư vấn -->
+<section class="bg-primary text-white py-5">
+    <div class="container text-center">
+        <h2 class="mb-3">📞 Cần tư vấn sức khỏe?</h2>
+        <p class="lead mb-4">Đội ngũ chuyên gia sẵn sàng hỗ trợ bạn 24/7</p>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <form asp-action="Consultation" asp-controller="Home" method="post">
+                    <div class="row g-2">
+                        <div class="col-md-5">
+                            <input type="text" name="FullName" class="form-control" placeholder="Họ tên" required>
+                        </div>
+                        <div class="col-md-5">
+                            <input type="tel" name="Phone" class="form-control" placeholder="Số điện thoại" required>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-light w-100">Gửi</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <p class="mt-3">Hoặc gọi ngay: <strong class="fs-4">1900 1717</strong> (miễn phí)</p>
+    </div>
+</section>

@@ -1,4 +1,6 @@
-﻿namespace Web_Đặt_lịch_phòng_khám.Models
+﻿using System.Collections.Generic;
+
+namespace Web_Đặt_lịch_phòng_khám.Models
 {
     public class Specialty
     {

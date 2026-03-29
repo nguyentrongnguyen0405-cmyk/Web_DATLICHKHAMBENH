@@ -1,21 +1,25 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Web_Đặt_lịch_phòng_khám.Data;
-using Web_Đặt_lịch_phòng_khám.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Web_Đặt_lịch_phòng_khám.Data;
+using Web_Đặt_lịch_phòng_khám.Models;
 
 namespace Web_Đặt_lịch_phòng_khám.Controllers
 {
     public class AppointmentsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public AppointmentsController(ApplicationDbContext context)
+        public AppointmentsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: /Appointments/Create
@@ -41,7 +45,6 @@ namespace Web_Đặt_lịch_phòng_khám.Controllers
 
             if (ModelState.IsValid)
             {
-                // 1. Tìm schedule theo doctorId và WorkDate
                 var schedule = await _context.Schedules
                     .FirstOrDefaultAsync(s => s.DoctorId == appointment.DoctorId &&
                                                s.WorkDate.Date == WorkDate.Date &&
@@ -52,7 +55,6 @@ namespace Web_Đặt_lịch_phòng_khám.Controllers
                     return RedirectToAction("Create");
                 }
 
-                // 2. Kiểm tra trùng slot
                 var isBooked = await _context.Appointments
                     .AnyAsync(a => a.DoctorId == appointment.DoctorId &&
                                    a.ScheduleId == schedule.Id &&
@@ -64,20 +66,25 @@ namespace Web_Đặt_lịch_phòng_khám.Controllers
                     return RedirectToAction("Create");
                 }
 
-                // 3. Gán các giá trị
+                var userId = _userManager.GetUserId(User);
+                if (string.IsNullOrEmpty(userId))
+                {
+                    TempData["Error"] = "Bạn cần đăng nhập để đặt lịch.";
+                    return RedirectToAction("Create");
+                }
+
                 appointment.ScheduleId = schedule.Id;
-                appointment.PatientId = await GetOrCreatePatientId();
-                appointment.Status = "pending";
+                appointment.PatientId = userId;
+                appointment.Status = "confirmed";  // Đã sửa: tự động xác nhận
                 appointment.CreatedAt = DateTime.Now;
 
                 _context.Appointments.Add(appointment);
                 await _context.SaveChangesAsync();
 
-                TempData["Success"] = "Đặt lịch thành công! Vui lòng chờ xác nhận.";
-                return RedirectToAction("Index", "Home");
+                TempData["Success"] = "Đặt lịch thành công! Lịch hẹn của bạn đã được xác nhận.";
+                return RedirectToAction("MyAppointments");  // Đã sửa: chuyển về trang lịch hẹn
             }
 
-            // Nếu có lỗi validation, load lại danh sách bác sĩ
             var doctors = await _context.Doctors.Include(d => d.User).Include(d => d.Specialty).ToListAsync();
             ViewBag.Doctors = doctors;
             return View(appointment);
@@ -115,24 +122,35 @@ namespace Web_Đặt_lịch_phòng_khám.Controllers
             return Json(new { slots = availableSlots });
         }
 
-        private async Task<int> GetOrCreatePatientId()
+        // GET: /Appointments/MyAppointments
+        [Authorize]
+        public async Task<IActionResult> MyAppointments()
         {
-            var patient = await _context.Users.FirstOrDefaultAsync(u => u.Email == "patient@example.com");
-            if (patient == null)
+            var userId = _userManager.GetUserId(User);
+            var appointments = await _context.Appointments
+                .Include(a => a.Doctor)
+                    .ThenInclude(d => d.User)
+                .Include(a => a.Doctor.Specialty)
+                .Include(a => a.Schedule)
+                .Where(a => a.PatientId == userId)
+                .OrderByDescending(a => a.CreatedAt)
+                .ToListAsync();
+
+            return View(appointments);
+        }
+
+        // POST: /Appointments/Cancel
+        [Authorize]
+        public async Task<IActionResult> Cancel(int id)
+        {
+            var appointment = await _context.Appointments.FindAsync(id);
+            if (appointment != null && appointment.PatientId == _userManager.GetUserId(User))
             {
-                patient = new User
-                {
-                    Email = "patient@example.com",
-                    Password = "123456",
-                    FullName = "Bệnh nhân mẫu",
-                    Phone = "0123456789",
-                    Role = "patient",
-                    CreatedAt = DateTime.Now
-                };
-                _context.Users.Add(patient);
+                appointment.Status = "cancelled";
                 await _context.SaveChangesAsync();
+                TempData["Success"] = "Đã hủy lịch hẹn thành công.";
             }
-            return patient.Id;
+            return RedirectToAction("MyAppointments");
         }
     }
 }

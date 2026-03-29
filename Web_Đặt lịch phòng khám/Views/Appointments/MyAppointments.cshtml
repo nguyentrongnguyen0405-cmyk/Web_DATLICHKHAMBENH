@@ -1,0 +1,85 @@
+﻿@model IEnumerable<Web_Đặt_lịch_phòng_khám.Models.Appointment>
+
+@{
+    ViewData["Title"] = "Lịch hẹn của tôi";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">📋 Lịch hẹn của tôi</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-calendar-alt"></i> Bạn chưa có lịch hẹn nào.
+            <a asp-action="Create" class="alert-link">Đặt lịch ngay</a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Bác sĩ</th>
+                        <th>Chuyên khoa</th>
+                        <th>Ngày khám</th>
+                        <th>Giờ khám</th>
+                        <th>Triệu chứng</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày đặt</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Doctor?.User?.FullName</td>
+                            <td>@item.Doctor?.Specialty?.Name</td>
+                            <td>@item.Schedule?.WorkDate.ToString("dd/MM/yyyy")</td>
+                            <td>@item.AppointmentTime.ToString(@"hh\:mm")</td>
+                            <td>@item.Symptoms</td>
+                            <td>
+                                @if (item.Status == "pending")
+                                {
+                                    <span class="badge bg-warning">Chờ xác nhận</span>
+                                }
+                                else if (item.Status == "confirmed")
+                                {
+                                    <span class="badge bg-success">Đã xác nhận</span>
+                                }
+                                else if (item.Status == "cancelled")
+                                {
+                                    <span class="badge bg-danger">Đã hủy</span>
+                                }
+                                else if (item.Status == "completed")
+                                {
+                                    <span class="badge bg-secondary">Đã khám</span>
+                                }
+                            </td>
+                            <td>@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                @if (item.Status == "pending" || item.Status == "confirmed")
+                                {
+                                    <a asp-action="Cancel" asp-route-id="@item.Id"
+                                       class="btn btn-sm btn-danger"
+                                       onclick="return confirm('Bạn có chắc muốn hủy lịch hẹn này?')">
+                                        Hủy
+                                    </a>
+                                }
+                                else if (item.Status == "cancelled")
+                                {
+                                    <span class="text-muted">Đã hủy</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">--</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

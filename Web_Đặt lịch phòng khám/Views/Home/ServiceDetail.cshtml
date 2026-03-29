@@ -1,0 +1,119 @@
+﻿@{
+    ViewData["Title"] = ViewBag.Service.Name;
+    var service = ViewBag.Service;
+}
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a asp-action="Services">Dịch vụ</a></li>
+            <li class="breadcrumb-item active">@service.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <img src="@service.Image" class="card-img-top" alt="@service.Name" style="max-height: 350px; object-fit: cover;" onerror="this.onerror=null;this.src='https://placehold.co/800x400?text=H%C3%ACnh+%E1%BA%A3nh'">
+                <div class="card-body">
+                    <h2 class="card-title">@service.Name</h2>
+                    <h5 class="text-primary">💰 Giá: @service.Price</h5>
+                    <p class="lead mt-3">@service.ShortDesc</p>
+                    <p>@service.FullDesc</p>
+
+                    @if (service.Features != null && service.Features.Count > 0)
+                    {
+                        <h5><i class="fas fa-list-check"></i> Nội dung dịch vụ:</h5>
+                        <ul class="list-group list-group-flush mb-3">
+                            @foreach (var item in service.Features)
+                            {
+                                <li class="list-group-item bg-transparent">✔ @item</li>
+                            }
+                        </ul>
+                    }
+
+                    @if (service.Tests != null && service.Tests.Count > 0)
+                    {
+                        <h5><i class="fas fa-flask"></i> Các xét nghiệm bao gồm:</h5>
+                        <ul class="list-group list-group-flush mb-3">
+                            @foreach (var item in service.Tests)
+                            {
+                                <li class="list-group-item bg-transparent">🔬 @item</li>
+                            }
+                        </ul>
+                    }
+
+                    @if (service.Benefits != null && service.Benefits.Count > 0)
+                    {
+                        <h5><i class="fas fa-gift"></i> Đặc quyền khi đặt lịch:</h5>
+                        <ul class="list-group list-group-flush mb-3">
+                            @foreach (var item in service.Benefits)
+                            {
+                                <li class="list-group-item bg-transparent">🎯 @item</li>
+                            }
+                        </ul>
+                    }
+
+                    @if (service.Packages != null)
+                    {
+                        <hr />
+                        <h4>📦 Chọn gói phù hợp</h4>
+                        <div class="row mt-3">
+                            @foreach (var pkg in service.Packages)
+                            {
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-primary text-white">
+                                            <h5 class="mb-0">@pkg.Name</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <h4 class="text-primary">@pkg.Price</h4>
+                                            <ul>
+                                                @foreach (var f in pkg.Features)
+                                                {
+                                                    <li>@f</li>
+                                                }
+                                            </ul>
+                                            <a asp-controller="Appointments" asp-action="Create" asp-route-service="@service.Id-@pkg.Name.Replace(" ", "-")" class="btn btn-outline-primary w-100 mt-2">Đặt lịch</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">📅 Đặt lịch ngay</h5>
+                </div>
+                <div class="card-body">
+                    <p><i class="fas fa-clock"></i> Thời gian: Thứ 2 - Thứ 7 (7:30 - 17:30)</p>
+                    <p><i class="fas fa-phone-alt"></i> Hotline: <strong>1900 1717</strong></p>
+                    <p><i class="fas fa-map-marker-alt"></i> Địa chỉ: 123 Nguyễn Trãi, Quận 1, TP.HCM</p>
+                    <a asp-controller="Appointments" asp-action="Create" asp-route-service="@service.Id" class="btn btn-primary btn-lg w-100 mt-3">
+                        📅 Đặt lịch hẹn
+                    </a>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">📞 Tư vấn miễn phí</h5>
+                </div>
+                <div class="card-body text-center">
+                    <i class="fas fa-phone-alt fa-3x text-info mb-2"></i>
+                    <h4>1900 1717</h4>
+                    <p>24/7 - Hoàn toàn miễn phí</p>
+                    <a href="https://zalo.me/19001717" class="btn btn-outline-primary w-100">
+                        <i class="fab fa-zalo"></i> Tư vấn qua Zalo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
