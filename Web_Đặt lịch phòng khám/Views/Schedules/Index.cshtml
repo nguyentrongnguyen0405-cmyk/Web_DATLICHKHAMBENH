@@ -1,0 +1,22 @@
+﻿@model IEnumerable<Web_Đặt_lịch_phòng_khám.Models.Schedule>
+@{
+    ViewData["Title"] = "Quản lý lịch trực";
+}
+<h2>📆 Quản lý lịch trực</h2>
+<p><a asp-action="Create" class="btn btn-primary">+ Thêm lịch trực mới</a></p>
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr><th>Ngày</th><th>Bắt đầu</th><th>Kết thúc</th><th>Trạng thái</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.WorkDate.ToString("dd/MM/yyyy")</td>
+                <td>@item.StartTime</td>
+                <td>@item.EndTime</td>
+                <td>@(item.IsActive ? "🟢 Có sẵn" : "🔴 Đã khóa")</td>
+            </tr>
+        }
+    </tbody>
+</table>

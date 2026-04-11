@@ -1,0 +1,221 @@
+﻿@model IEnumerable<Web_Đặt_lịch_phòng_khám.Models.Specialty>
+@{
+    ViewData["Title"] = "Trang chủ - Phòng khám Đặt lịch";
+}
+
+<!-- Slider chính -->
+<div id="mainSlider" class="carousel slide carousel-fade" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#mainSlider" data-bs-slide-to="0" class="active"></button>
+        <button type="button" data-bs-target="#mainSlider" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#mainSlider" data-bs-slide-to="2"></button>
+    </div>
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <div class="container py-5">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 text-start">
+                        <h1 class="display-4 fw-bold text-dark">Xét nghiệm chính xác - Kết quả nhanh</h1>
+                        <p class="lead text-secondary">Hệ thống đạt chuẩn ISO 15189, công nghệ hiện đại</p>
+                        <div class="mt-4">
+                            <a asp-controller="Appointments" asp-action="Create" class="btn btn-primary btn-lg me-3 px-4">📅 Đặt lịch hẹn</a>
+                            <a href="#services" class="btn btn-outline-primary btn-lg px-4">🔍 Khám phá dịch vụ</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 text-center">
+                        <img src="/images/slider/slide1.webp" alt="Slide 1" class="img-fluid rounded shadow">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="container py-5">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 text-start">
+                        <h1 class="display-4 fw-bold text-dark">Đội ngũ bác sĩ chuyên môn cao</h1>
+                        <p class="lead text-secondary">Tận tâm, giàu kinh nghiệm, luôn đồng hành cùng sức khỏe của bạn</p>
+                        <div class="mt-4">
+                            <a asp-controller="Appointments" asp-action="Create" class="btn btn-primary btn-lg me-3 px-4">📅 Đặt lịch hẹn</a>
+                            <a href="#services" class="btn btn-outline-primary btn-lg px-4">🔍 Khám phá dịch vụ</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 text-center">
+                        <img src="/images/slider/slide2.webp" alt="Slide 2" class="img-fluid rounded shadow">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="container py-5">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 text-start">
+                        <h1 class="display-4 fw-bold text-dark">Phòng khám & Xét nghiệm DIAG</h1>
+                        <p class="lead text-secondary">Chăm sóc sức khỏe toàn diện - Kết quả nhanh chóng - Tận tâm vì bạn</p>
+                        <div class="mt-4">
+                            <a asp-controller="Appointments" asp-action="Create" class="btn btn-primary btn-lg me-3 px-4">📅 Đặt lịch hẹn</a>
+                            <a href="#services" class="btn btn-outline-primary btn-lg px-4">🔍 Khám phá dịch vụ</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 text-center">
+                        <img src="/images/slider/slide3.webp" alt="Slide 3" class="img-fluid rounded shadow">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#mainSlider" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#mainSlider" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+
+<!-- Dịch vụ nổi bật (lấy từ database) -->
+<section id="services" class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">🌟 Dịch vụ nổi bật</h2>
+        <div class="row g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 shadow-sm service-card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-stethoscope fa-3x text-primary mb-3"></i>
+                            <h5 class="card-title">@item.Name</h5>
+                            <p class="card-text">@(item.ShortDescription ?? item.Description)</p>
+                            <span class="price fw-bold text-primary">@(item.Price ?? "Liên hệ")</span>
+                            <div class="mt-3">
+                                <a asp-action="ServiceDetail" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Xem chi tiết</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- 40+ Gói xét nghiệm -->
+<section class="bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">🔬 40+ Gói xét nghiệm chuyên sâu</h2>
+        <div class="row g-4">
+            <div class="col-md-3"><div class="p-3 bg-white rounded shadow-sm text-center"><i class="fas fa-tint fa-2x text-primary mb-2"></i><p class="fw-bold mb-1">Xét nghiệm máu</p><small>Tổng phân tích</small></div></div>
+            <div class="col-md-3"><div class="p-3 bg-white rounded shadow-sm text-center"><i class="fas fa-lungs fa-2x text-primary mb-2"></i><p class="fw-bold mb-1">Chức năng hô hấp</p><small>Đo chức năng phổi</small></div></div>
+            <div class="col-md-3"><div class="p-3 bg-white rounded shadow-sm text-center"><i class="fas fa-liver fa-2x text-primary mb-2"></i><p class="fw-bold mb-1">Chức năng gan</p><small>AST, ALT, GGT</small></div></div>
+            <div class="col-md-3"><div class="p-3 bg-white rounded shadow-sm text-center"><i class="fas fa-kidneys fa-2x text-primary mb-2"></i><p class="fw-bold mb-1">Chức năng thận</p><small>Creatinine, Ure</small></div></div>
+            <div class="col-md-3"><div class="p-3 bg-white rounded shadow-sm text-center"><i class="fas fa-heartbeat fa-2x text-primary mb-2"></i><p class="fw-bold mb-1">Men tim</p><small>CK-MB, Troponin</small></div></div>
+            <div class="col-md-3"><div class="p-3 bg-white rounded shadow-sm text-center"><i class="fas fa-virus fa-2x text-primary mb-2"></i><p class="fw-bold mb-1">Viêm gan B, C</p><small>HBsAg, Anti-HCV</small></div></div>
+            <div class="col-md-3"><div class="p-3 bg-white rounded shadow-sm text-center"><i class="fas fa-dna fa-2x text-primary mb-2"></i><p class="fw-bold mb-1">Xét nghiệm HPV</p><small>Phát hiện sớm ung thư</small></div></div>
+            <div class="col-md-3"><div class="p-3 bg-white rounded shadow-sm text-center"><i class="fas fa-apple-alt fa-2x text-primary mb-2"></i><p class="fw-bold mb-1">Đường huyết</p><small>HbA1c, Glucose</small></div></div>
+        </div>
+        <div class="text-center mt-4">
+            <a asp-controller="Appointments" asp-action="Create" class="btn btn-primary btn-lg">📅 Đặt lịch xét nghiệm ngay</a>
+        </div>
+    </div>
+</section>
+
+<!-- Lý do chọn chúng tôi -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Tại sao chọn <span class="text-primary">Phòng khám Đặt lịch</span>?</h2>
+        <div class="row g-4">
+            <div class="col-md-4 text-center"><div class="feature-icon mx-auto"><i class="fas fa-microscope fa-3x text-primary"></i></div><h5 class="mt-3">Trang thiết bị hiện đại</h5><p>Kết quả nhanh, chính xác, đạt chuẩn quốc tế</p></div>
+            <div class="col-md-4 text-center"><div class="feature-icon mx-auto"><i class="fas fa-user-md fa-3x text-primary"></i></div><h5 class="mt-3">Đội ngũ chuyên gia giỏi</h5><p>Bác sĩ đầu ngành, tận tâm, giàu kinh nghiệm</p></div>
+            <div class="col-md-4 text-center"><div class="feature-icon mx-auto"><i class="fas fa-calendar-check fa-3x text-primary"></i></div><h5 class="mt-3">Đặt lịch trực tuyến</h5><p>Hệ thống thông minh, tiết kiệm thời gian</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- Quy trình đặt lịch -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">Quy trình <span class="text-primary">đặt lịch</span> nhanh chóng</h2>
+        <div class="row text-center g-4">
+            <div class="col-md-4"><div class="bg-white p-4 rounded-4 shadow-sm h-100"><span class="badge bg-primary rounded-pill px-3 py-2 mb-3 fs-5">1</span><h5>Chọn dịch vụ</h5><p>Chọn gói khám hoặc bác sĩ phù hợp</p></div></div>
+            <div class="col-md-4"><div class="bg-white p-4 rounded-4 shadow-sm h-100"><span class="badge bg-primary rounded-pill px-3 py-2 mb-3 fs-5">2</span><h5>Chọn thời gian</h5><p>Xem lịch trực và chọn khung giờ rảnh</p></div></div>
+            <div class="col-md-4"><div class="bg-white p-4 rounded-4 shadow-sm h-100"><span class="badge bg-primary rounded-pill px-3 py-2 mb-3 fs-5">3</span><h5>Xác nhận & đến khám</h5><p>Nhận thông báo và đến đúng giờ</p></div></div>
+        </div>
+        <div class="text-center mt-5"><a asp-controller="Appointments" asp-action="Create" class="btn btn-primary btn-lg">Đặt lịch ngay</a></div>
+    </div>
+</section>
+
+<!-- Thống kê ấn tượng -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3"><h2 class="display-4 fw-bold">10+</h2><p>Năm kinh nghiệm</p></div>
+            <div class="col-md-3"><h2 class="display-4 fw-bold">50+</h2><p>Bác sĩ chuyên khoa</p></div>
+            <div class="col-md-3"><h2 class="display-4 fw-bold">100k+</h2><p>Khách hàng tin tưởng</p></div>
+            <div class="col-md-3"><h2 class="display-4 fw-bold">24/7</h2><p>Hỗ trợ trực tuyến</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- Đánh giá khách hàng -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">💬 Khách hàng nói về chúng tôi</h2>
+        <div class="row g-4">
+            <div class="col-md-4"><div class="card h-100 shadow-sm p-4"><p><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i></p><p>"Dịch vụ đặt lịch rất tiện lợi, bác sĩ tận tâm. Tôi sẽ giới thiệu cho bạn bè."</p><p class="fw-bold mt-2">- Chị Minh Anh (Quận 1)</p></div></div>
+            <div class="col-md-4"><div class="card h-100 shadow-sm p-4"><p><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i></p><p>"Kết quả xét nghiệm nhanh, đúng hẹn. Nhân viên thân thiện."</p><p class="fw-bold mt-2">- Anh Hoàng (Quận 3)</p></div></div>
+            <div class="col-md-4"><div class="card h-100 shadow-sm p-4"><p><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i></p><p>"Trang web dễ sử dụng, đặt lịch nhanh chóng. Rất hài lòng!"</p><p class="fw-bold mt-2">- Chị Lan (Quận Tân Bình)</p></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- Bác sĩ tiêu biểu -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">👨‍⚕️ Đội ngũ bác sĩ tiêu biểu</h2>
+        <div class="row g-4">
+            <div class="col-md-4"><div class="card text-center shadow-sm h-100"><div class="card-body"><i class="fas fa-user-md fa-4x text-primary mb-3"></i><h5>PGS.TS.BS Nguyễn Văn An</h5><p class="text-muted">Nội tổng quát</p><span class="badge bg-success mb-2">15 năm kinh nghiệm</span><div><a asp-controller="Appointments" asp-action="Create" class="btn btn-primary btn-sm">Đặt lịch</a></div></div></div></div>
+            <div class="col-md-4"><div class="card text-center shadow-sm h-100"><div class="card-body"><i class="fas fa-user-md fa-4x text-primary mb-3"></i><h5>TS.BS Trần Thị Bích</h5><p class="text-muted">Nhi khoa</p><span class="badge bg-success mb-2">12 năm kinh nghiệm</span><div><a asp-controller="Appointments" asp-action="Create" class="btn btn-primary btn-sm">Đặt lịch</a></div></div></div></div>
+            <div class="col-md-4"><div class="card text-center shadow-sm h-100"><div class="card-body"><i class="fas fa-user-md fa-4x text-primary mb-3"></i><h5>BS.CKII Lê Văn Cường</h5><p class="text-muted">Răng hàm mặt</p><span class="badge bg-success mb-2">10 năm kinh nghiệm</span><div><a asp-controller="Appointments" asp-action="Create" class="btn btn-primary btn-sm">Đặt lịch</a></div></div></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- Bài viết sức khỏe -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">📝 Bài viết nổi bật</h2>
+        <div class="row g-4">
+            <div class="col-md-4"><div class="card h-100"><img src="/images/health-tip-1.jpg" class="card-img-top" alt="Dinh dưỡng" style="height: 200px; object-fit: cover;"><div class="card-body"><h5>Chế độ ăn cho người cao huyết áp</h5><p>Hạn chế muối, tăng cường rau xanh và thực phẩm giàu kali...</p><a href="#" class="btn btn-link text-primary p-0">Đọc tiếp →</a></div></div></div>
+            <div class="col-md-4"><div class="card h-100"><img src="/images/health-tip-2.jpg" class="card-img-top" alt="Tập thể dục" style="height: 200px; object-fit: cover;"><div class="card-body"><h5>Lợi ích của đi bộ 30 phút mỗi ngày</h5><p>Giảm nguy cơ tim mạch, cải thiện tâm trạng, kiểm soát cân nặng...</p><a href="#" class="btn btn-link text-primary p-0">Đọc tiếp →</a></div></div></div>
+            <div class="col-md-4"><div class="card h-100"><img src="/images/health-tip-3.jpg" class="card-img-top" alt="Tiêm phòng" style="height: 200px; object-fit: cover;"><div class="card-body"><h5>Lịch tiêm chủng cho trẻ em</h5><p>Cập nhật các mũi tiêm quan trọng theo khuyến cáo của Bộ Y tế...</p><a href="#" class="btn btn-link text-primary p-0">Đọc tiếp →</a></div></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- Banner ưu đãi -->
+<section class="py-5 bg-info text-white text-center">
+    <div class="container">
+        <h2 class="display-5 fw-bold">🎁 Ưu đãi đặc biệt</h2>
+        <p class="lead">Đặt lịch khám trong tháng này – Giảm ngay 20% chi phí xét nghiệm</p>
+        <a asp-controller="Appointments" asp-action="Create" class="btn btn-light btn-lg mt-3">Đặt lịch ngay</a>
+    </div>
+</section>
+
+<!-- Đăng ký tư vấn -->
+<section class="bg-primary text-white py-5">
+    <div class="container text-center">
+        <h2 class="mb-3">📞 Cần tư vấn sức khỏe?</h2>
+        <p class="lead mb-4">Đội ngũ chuyên gia sẵn sàng hỗ trợ bạn 24/7</p>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <form asp-action="Consultation" asp-controller="Home" method="post">
+                    <div class="row g-2">
+                        <div class="col-md-5"><input type="text" name="FullName" class="form-control" placeholder="Họ tên" required></div>
+                        <div class="col-md-5"><input type="tel" name="Phone" class="form-control" placeholder="Số điện thoại" required></div>
+                        <div class="col-md-2"><button type="submit" class="btn btn-light w-100">Gửi</button></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <p class="mt-3">Hoặc gọi ngay: <strong class="fs-4">1900 1717</strong> (miễn phí)</p>
+    </div>
+</section>

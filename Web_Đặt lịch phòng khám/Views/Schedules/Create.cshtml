@@ -1,0 +1,12 @@
+﻿@model Web_Đặt_lịch_phòng_khám.Models.Schedule
+@{
+    ViewData["Title"] = "Thêm lịch trực";
+}
+<h2>➕ Thêm lịch trực</h2>
+<form asp-action="Create" method="post">
+    <div class="mb-3"><label class="form-label">Ngày</label><input asp-for="WorkDate" type="date" class="form-control" required /></div>
+    <div class="mb-3"><label class="form-label">Bắt đầu</label><input asp-for="StartTime" type="time" class="form-control" required /></div>
+    <div class="mb-3"><label class="form-label">Kết thúc</label><input asp-for="EndTime" type="time" class="form-control" required /></div>
+    <button type="submit" class="btn btn-success">Lưu</button>
+    <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+</form>

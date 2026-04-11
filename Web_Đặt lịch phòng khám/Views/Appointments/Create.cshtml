@@ -1,0 +1,78 @@
+﻿@{
+    ViewData["Title"] = "Đặt lịch khám";
+}
+
+<div class="booking-container">
+    <div class="booking-header">
+        <h2>Đặt lịch khám</h2>
+        <p>Chọn bác sĩ và thời gian phù hợp với bạn</p>
+    </div>
+    <div class="booking-form">
+        <form id="bookingForm" method="post">
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <label>Chọn bác sĩ</label>
+                <select id="doctorId" name="doctorId" class="form-control" required>
+                    <option value="">-- Chọn bác sĩ --</option>
+                    @foreach (var doctor in ViewBag.Doctors)
+                    {
+                        <option value="@doctor.Id">@doctor.FullName - @doctor.Specialty?.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Ngày khám</label>
+                <input type="date" id="workDate" name="workDate" class="form-control" required min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
+            </div>
+
+            <div class="form-group">
+                <label>Giờ khám</label>
+                <select id="appointmentTime" name="appointmentTime" class="form-control" required disabled>
+                    <option value="">-- Chọn giờ --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Triệu chứng (nếu có)</label>
+                <textarea name="symptoms" class="form-control" rows="3" placeholder="Mô tả triệu chứng..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Xác nhận đặt lịch</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            function loadSlots() {
+                var doctorId = $('#doctorId').val();
+                var workDate = $('#workDate').val();
+                if (doctorId && workDate) {
+                    $.get('/Appointments/GetAvailableSlots', { doctorId: doctorId, date: workDate }, function(data) {
+                        var slotSelect = $('#appointmentTime');
+                        slotSelect.empty();
+                        slotSelect.append('<option value="">-- Chọn giờ --</option>');
+                        if (data.slots && data.slots.length > 0) {
+                            $.each(data.slots, function(i, slot) {
+                                slotSelect.append('<option value="' + slot + '">' + slot + '</option>');
+                            });
+                            slotSelect.prop('disabled', false);
+                        } else {
+                            slotSelect.append('<option value="">Không có slot trống</option>');
+                            slotSelect.prop('disabled', true);
+                        }
+                    }).fail(function() {
+                        alert('Lỗi khi lấy slot trống!');
+                    });
+                } else {
+                    $('#appointmentTime').prop('disabled', true);
+                }
+            }
+
+            $('#doctorId, #workDate').change(loadSlots);
+        });
+    </script>
+}

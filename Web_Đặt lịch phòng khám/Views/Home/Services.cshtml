@@ -1,0 +1,71 @@
+﻿@{
+    ViewData["Title"] = "Dịch vụ";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Dịch vụ của chúng tôi</h2>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">🏥 Khám tổng quát</h5>
+                    <p class="card-text">Kiểm tra sức khỏe toàn diện, phát hiện sớm các bệnh lý.</p>
+                    <p class="text-primary fw-bold">Giá: 500.000đ</p>
+                    <a asp-controller="Home" asp-action="ServiceDetail" asp-route-id="kham-tong-quat" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">👶 Khám nhi khoa</h5>
+                    <p class="card-text">Chăm sóc sức khỏe trẻ em, tiêm chủng, dinh dưỡng.</p>
+                    <p class="text-primary fw-bold">Giá: 400.000đ</p>
+                    <a asp-controller="Home" asp-action="ServiceDetail" asp-route-id="nhi-khoa" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">🦷 Răng hàm mặt</h5>
+                    <p class="card-text">Nhổ răng, trám răng, tẩy trắng, niềng răng.</p>
+                    <p class="text-primary fw-bold">Giá: 600.000đ</p>
+                    <a asp-controller="Home" asp-action="ServiceDetail" asp-route-id="rang-ham-mat" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">❤️ Tim mạch</h5>
+                    <p class="card-text">Khám và điều trị các bệnh về tim mạch, huyết áp.</p>
+                    <p class="text-primary fw-bold">Giá: 700.000đ</p>
+                    <a asp-controller="Home" asp-action="ServiceDetail" asp-route-id="tim-mach" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">🩺 Xét nghiệm</h5>
+                    <p class="card-text">Xét nghiệm máu, nước tiểu, chẩn đoán hình ảnh.</p>
+                    <p class="text-primary fw-bold">Giá: 300.000đ</p>
+                    <a asp-controller="Home" asp-action="ServiceDetail" asp-route-id="xet-nghiem" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">💊 Tư vấn sức khỏe</h5>
+                    <p class="card-text">Tư vấn dinh dưỡng, phòng ngừa bệnh tật.</p>
+                    <p class="text-primary fw-bold">Miễn phí</p>
+                    <a asp-controller="Home" asp-action="ServiceDetail" asp-route-id="xet-nghiem-std" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
