@@ -1,0 +1,14 @@
+﻿@model IEnumerable<Web_Đặt_lịch_phòng_khám.Models.Doctor>
+
+<div class="row">
+    @foreach (var doc in Model)
+    {
+        <div class="col-md-6 mb-4">
+            <h5>@doc.FullName</h5>
+            @* Đảm bảo Qualifications khớp với tên thuộc tính trong file .cs *@
+            <p>@doc.Qualifications</p>
+            <p>Giá khám: @doc.ConsultationFee.ToString("N0")đ</p>
+            <a asp-action="Confirm" asp-route-doctorId="@doc.Id" class="btn btn-primary">Đặt lịch ngay</a>
+        </div>
+    }
+</div>

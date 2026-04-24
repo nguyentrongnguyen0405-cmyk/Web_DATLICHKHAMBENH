@@ -1,0 +1,230 @@
+﻿/* ========== CẢI TIẾN HIỆN ĐẠI ========== */
+:root {
+    --primary: #0d6efd;
+    --primary-dark: #0056b3;
+    --secondary: #6c757d;
+    --success: #198754;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --light: #f8f9fa;
+    --dark: #212529;
+    --transition: all 0.3s ease;
+    --shadow-sm: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+    --shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+    --shadow-lg: 0 1rem 3rem rgba(0,0,0,0.175);
+}
+
+/* Font chữ hiện đại */
+body {
+    font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+}
+
+/* Navbar nổi bật hơn */
+.navbar {
+    backdrop-filter: blur(10px);
+    background-color: rgba(255,255,255,0.95);
+    transition: var(--transition);
+}
+
+    .navbar.scrolled {
+        box-shadow: var(--shadow);
+        background-color: white;
+    }
+
+/* Button gradient */
+.btn-primary {
+    background: linear-gradient(45deg, var(--primary), #00a1e0);
+    border: none;
+    border-radius: 40px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+    }
+
+.btn-outline-primary {
+    border-radius: 40px;
+    border-width: 2px;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+    .btn-outline-primary:hover {
+        transform: translateY(-2px);
+        background-color: var(--primary);
+        color: white;
+    }
+
+/* Card hiện đại */
+.card {
+    border: none;
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: var(--transition);
+    background: white;
+}
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+
+.card-img-top {
+    transition: var(--transition);
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+/* Badge mới */
+.badge {
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+    font-weight: 500;
+}
+
+/* Section title có hiệu ứng */
+.section-title {
+    position: relative;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    display: inline-block;
+}
+
+    .section-title:after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 60px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), #00a1e0);
+        border-radius: 2px;
+    }
+
+.text-center .section-title:after {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Footer hiện đại */
+.footer {
+    background: linear-gradient(135deg, #1a2a3a, #0f172a);
+    color: #cbd5e1;
+}
+
+    .footer a {
+        transition: var(--transition);
+    }
+
+        .footer a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+
+/* Responsive điều chỉnh */
+@media (max-width: 768px) {
+    .section-title {
+        font-size: 1.8rem;
+    }
+
+    .btn-primary, .btn-outline-primary {
+        padding: 0.5rem 1.2rem;
+        font-size: 0.9rem;
+    }
+}
+/* Form đăng ký & đặt lịch */
+.card {
+    border-radius: 1.5rem;
+    transition: all 0.3s;
+}
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1.5rem 2rem rgba(0,0,0,0.1);
+    }
+
+.form-control, .form-select {
+    border-radius: 0.75rem;
+    border: 1px solid #e2e8f0;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+}
+
+    .form-control:focus, .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.25);
+    }
+
+.btn-primary {
+    background: linear-gradient(45deg, #0d6efd, #00a1e0);
+    border: none;
+    border-radius: 2rem;
+    font-weight: 700;
+    transition: all 0.3s;
+}
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(13,110,253,0.3);
+    }
+
+.form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+.transition-all {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 30px -12px rgba(0,0,0,0.2) !important;
+}
+/* Form đăng ký & đặt lịch */
+.card {
+    border-radius: 1.5rem;
+    transition: all 0.3s;
+}
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1.5rem 2rem rgba(0,0,0,0.1);
+    }
+
+.form-control, .form-select {
+    border-radius: 0.75rem;
+    border: 1px solid #e2e8f0;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+}
+
+    .form-control:focus, .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.25);
+    }
+
+.btn-primary {
+    background: linear-gradient(45deg, #0d6efd, #00a1e0);
+    border: none;
+    border-radius: 2rem;
+    font-weight: 700;
+    transition: all 0.3s;
+}
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(13,110,253,0.3);
+    }
+
+.form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}

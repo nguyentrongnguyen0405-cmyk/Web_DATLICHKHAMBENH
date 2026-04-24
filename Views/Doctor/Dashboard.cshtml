@@ -1,0 +1,193 @@
+﻿@{
+    ViewData["Title"] = "Dashboard Bác sĩ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .doctor-wrapper {
+        display: flex;
+        gap: 24px;
+        margin-top: 20px;
+    }
+
+    .doctor-sidebar {
+        width: 280px;
+        background: #f8fafc;
+        border-radius: 28px;
+        padding: 24px 0;
+        box-shadow: 0 15px 35px -10px rgba(0,0,0,0.05);
+        height: fit-content;
+        position: sticky;
+        top: 20px;
+    }
+
+        .doctor-sidebar .menu-item {
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+            margin: 6px 0;
+            border-radius: 0 12px 12px 0;
+        }
+
+            .doctor-sidebar .menu-item i {
+                width: 32px;
+                font-size: 1.3rem;
+                text-align: center;
+            }
+
+            .doctor-sidebar .menu-item:hover,
+            .doctor-sidebar .menu-item.active {
+                background: #e6f0ff;
+                color: #0d6efd;
+                border-left-color: #0d6efd;
+            }
+
+    .doctor-content {
+        flex: 1;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 24px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+        border: 1px solid #f0f2f5;
+        transition: all 0.25s;
+        text-align: center;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 25px -10px rgba(0,0,0,0.1);
+        }
+
+    .top-card {
+        background: white;
+        border-radius: 24px;
+        padding: 20px;
+        border: 1px solid #f0f2f5;
+        height: 100%;
+    }
+
+    .greeting-banner {
+        background: linear-gradient(105deg, #0d6efd 0%, #00a1e0 100%);
+        border-radius: 28px;
+        padding: 20px 28px;
+        margin-bottom: 28px;
+        color: white;
+    }
+
+    .badge-rank {
+        background: #ffeed9;
+        color: #b45309;
+        padding: 4px 12px;
+        border-radius: 40px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    @@media (max-width: 768px) {
+        .doctor-wrapper {
+            flex-direction: column;
+        }
+
+        .doctor-sidebar {
+            width: 100%;
+            position: static;
+        }
+    }
+</style>
+
+<div class="doctor-wrapper">
+    <!-- Sidebar -->
+    <div class="doctor-sidebar">
+        <a href="/Doctor/Dashboard" class="menu-item active text-decoration-none">
+            <i class="fas fa-chart-line"></i> <span>Dashboard</span>
+        </a>
+        <a href="/Appointments/MyAppointments" class="menu-item text-decoration-none">
+            <i class="fas fa-calendar-check"></i> <span>Lịch hẹn của tôi</span>
+        </a>
+        <a href="/Schedules" class="menu-item text-decoration-none">
+            <i class="fas fa-calendar-alt"></i> <span>Quản lý lịch trực</span>
+        </a>
+        <div class="menu-divider" style="height:1px; background:#eef2ff; margin:12px 20px;"></div>
+        <a href="#" class="menu-item text-decoration-none">
+            <i class="fas fa-user-circle"></i> <span>Hồ sơ cá nhân</span>
+        </a>
+    </div>
+
+    <!-- Nội dung chính -->
+    <div class="doctor-content">
+        <div class="greeting-banner">
+            <h3 class="fw-bold mb-1">👨‍⚕️ Chào mừng, Bác sĩ!</h3>
+            <p class="mb-0 opacity-75">Hôm nay là @DateTime.Now.ToString("dd/MM/yyyy") - Tổng quan công việc của bạn</p>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-calendar-day fa-2x text-primary"></i></div>
+                    <h2 class="fw-bold mb-0">@ViewBag.AppointmentCount</h2>
+                    <p class="text-muted mb-0">Tổng lịch hẹn</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-hourglass-half fa-2x text-warning"></i></div>
+                    <h2 class="fw-bold mb-0">@ViewBag.PendingCount</h2>
+                    <p class="text-muted mb-0">Chờ xác nhận</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-check-circle fa-2x text-success"></i></div>
+                    <h2 class="fw-bold mb-0">@ViewBag.ConfirmedCount</h2>
+                    <p class="text-muted mb-0">Đã xác nhận</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-times-circle fa-2x text-danger"></i></div>
+                    <h2 class="fw-bold mb-0">@ViewBag.CancelledCount</h2>
+                    <p class="text-muted mb-0">Đã hủy</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="top-card d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="badge-rank mb-2"><i class="fas fa-trophy me-1"></i> BỆNH NHÂN THÂN THIẾT</div>
+                        <h4 class="fw-bold mb-1">@ViewBag.TopPatient</h4>
+                        <p class="text-muted mb-0">@ViewBag.TopPatientCount lượt đặt lịch</p>
+                    </div>
+                    <i class="fas fa-user-friends fa-3x text-primary opacity-50"></i>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="top-card d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="badge-rank mb-2"><i class="fas fa-clock me-1"></i> LỊCH TRỰC SẮP TỚI</div>
+                        <h4 class="fw-bold mb-1">Xem lịch trực</h4>
+                        <p class="text-muted mb-0">Quản lý khung giờ làm việc</p>
+                    </div>
+                    <i class="fas fa-calendar-week fa-3x text-primary opacity-50"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nút nhanh -->
+        <div class="mt-5 d-flex gap-3 flex-wrap justify-content-end">
+            <a href="/Appointments/MyAppointments" class="btn btn-outline-primary rounded-pill"><i class="fas fa-list me-1"></i> Xem lịch hẹn</a>
+            <a href="/Schedules" class="btn btn-outline-primary rounded-pill"><i class="fas fa-plus-circle me-1"></i> Thêm lịch trực</a>
+        </div>
+    </div>
+</div>

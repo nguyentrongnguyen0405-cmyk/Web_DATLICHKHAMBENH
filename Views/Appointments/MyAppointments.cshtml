@@ -1,0 +1,144 @@
+﻿@model IEnumerable<Web_Đặt_lịch_phòng_khám.Models.Appointment>
+@{
+    ViewData["Title"] = ViewBag.Title ?? "Lịch hẹn của tôi";
+    var isDoctor = ViewBag.IsDoctor ?? false;
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (!Model.Any())
+{
+    <p>Bạn chưa có lịch hẹn nào.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="table-light">
+                <tr>
+                    @if (isDoctor)
+                    {
+                        <th>Bệnh nhân</th>
+                    }
+                    <th>Bác sĩ</th>
+                    <th>Chuyên khoa</th>
+                    <th>Ngày khám</th>
+                    <th>Giờ</th>
+                    <th>Triệu chứng</th>
+                    <th>Trạng thái</th>
+                    <th>Thanh toán</th>
+                    @if (isDoctor || User.IsInRole("Admin"))
+                    {
+                        <th>Xác nhận / Từ chối</th>
+                        <th>Thao tác thanh toán</th>
+                    }
+                    <th>Xóa</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        @if (isDoctor)
+                        {
+                            <td>@(item.User?.FullName) (@(item.User?.Email))</td>
+                        }
+                        <td>@(item.Doctor?.FullName)</td>
+                        <td>@(item.Doctor?.Specialty?.Name)</td>
+                        <td>@(item.Schedule?.WorkDate.ToString("dd/MM/yyyy"))</td>
+                        <td>@(item.Schedule?.StartTime.ToString(@"hh\:mm")) - @(item.Schedule?.EndTime.ToString(@"hh\:mm"))</td>
+                        <td>@item.Symptoms</td>
+                        <td>
+                            @if (item.Status == "pending")
+                            {
+                                <span class="badge bg-warning text-dark">Chờ xác nhận</span>
+                            }
+                            else if (item.Status == "confirmed")
+                            {
+                                <span class="badge bg-success">Đã xác nhận</span>
+                            }
+                            else if (item.Status == "cancelled")
+                            {
+                                <span class="badge bg-danger">Đã hủy</span>
+                            }
+                            else
+                            {
+                                <span>@item.Status</span>
+                            }
+                        </td>
+                        <td>
+                            @if (item.PaymentStatus == "Paid")
+                            {
+                                <span class="badge bg-success">Đã thanh toán</span>
+                            }
+                            else if (item.PaymentStatus == "Pending")
+                            {
+                                <span class="badge bg-warning text-dark">Chưa thanh toán</span>
+                            }
+                            else
+                            {
+                                <span>@item.PaymentStatus</span>
+                            }
+                        </td>
+                        @if (isDoctor || User.IsInRole("Admin"))
+                        {
+                            <td>
+                                @if (item.Status == "pending")
+                                {
+                                    <form asp-action="UpdateStatus" method="post" style="display:inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="appointmentId" value="@item.Id" />
+                                        <input type="hidden" name="status" value="confirmed" />
+                                        <button type="submit" class="btn btn-success btn-sm">Xác nhận</button>
+                                    </form>
+                                    <form asp-action="UpdateStatus" method="post" style="display:inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="appointmentId" value="@item.Id" />
+                                        <input type="hidden" name="status" value="cancelled" />
+                                        <button type="submit" class="btn btn-danger btn-sm">Từ chối</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span>--</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.PaymentStatus != "Paid" && item.Status == "confirmed")
+                                {
+                                    <form asp-action="UpdatePaymentStatus" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="appointmentId" value="@item.Id" />
+                                        <button type="submit" class="btn btn-sm btn-info">Xác nhận thanh toán</button>
+                                    </form>
+                                }
+                                else if (item.PaymentStatus == "Paid")
+                                {
+                                    <a asp-action="ExportInvoice" asp-route-id="@item.Id" class="btn btn-sm btn-secondary">Xuất hóa đơn</a>
+                                }
+                                else
+                                {
+                                    <span>--</span>
+                                }
+                            </td>
+                        }
+                        <td>
+                            @if ((!isDoctor && item.Status == "pending") || User.IsInRole("Admin") || (isDoctor && item.Status == "pending"))
+                            {
+                                <form asp-action="Delete" method="post" onsubmit="return confirm('Bạn có chắc muốn xóa lịch hẹn này?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span>--</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

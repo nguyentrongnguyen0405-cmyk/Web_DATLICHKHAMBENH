@@ -1,0 +1,36 @@
+﻿@{
+    ViewData["Title"] = ViewBag.Group + " - Nhóm xét nghiệm";
+    var data = ViewBag.Data as dynamic;
+}
+<div class="container mt-4">
+    @if (data != null)
+    {
+        <div class="row">
+            <div class="col-md-5">
+                <img src="@data.Image" class="img-fluid rounded-4 shadow-sm" alt="@ViewBag.Group" style="width: 100%; object-fit: cover; max-height: 350px;">
+            </div>
+            <div class="col-md-7">
+                <h1 class="text-primary fw-bold">@data.Title</h1>
+                <p class="lead mt-3">@data.Description</p>
+                <h4 class="mt-4">📋 Các xét nghiệm bao gồm:</h4>
+                <ul class="list-group list-group-flush mb-3">
+                    @foreach (var test in data.Tests)
+                    {
+                        <li class="list-group-item bg-transparent">✔ @test</li>
+                    }
+                </ul>
+                <h4 class="text-primary mt-3">💰 Giá: @data.Price</h4>
+                <a asp-controller="Appointments" asp-action="Create" class="btn btn-primary btn-lg rounded-pill px-4 mt-3">📅 Đặt lịch ngay</a>
+                <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 mt-3 ms-2">← Quay lại trang chủ</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm p-5 text-center">
+            <h2 class="text-primary">🧪 @ViewBag.Group</h2>
+            <p class="lead mt-3">Trang chi tiết cho nhóm <strong>@ViewBag.Group</strong> đang được phát triển.</p>
+            <a asp-action="Index" class="btn btn-primary rounded-pill px-4 mt-3">← Quay lại trang chủ</a>
+        </div>
+    }
+</div>

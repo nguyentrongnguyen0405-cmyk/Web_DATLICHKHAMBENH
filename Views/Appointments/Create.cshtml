@@ -1,0 +1,83 @@
+﻿@{
+    ViewData["Title"] = "Đặt lịch khám";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg rounded-4 p-4">
+                <h2 class="text-center fw-bold text-primary mb-4">📅 ĐẶT LỊCH KHÁM</h2>
+                <p class="text-center text-muted">Chọn bác sĩ và thời gian phù hợp với bạn</p>
+                <form id="bookingForm" method="post" asp-action="Create">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Chọn bác sĩ (*)</label>
+                        <select id="doctorId" name="doctorId" class="form-select form-select-lg" required>
+                            <option value="">-- Chọn bác sĩ --</option>
+                            @foreach (var doctor in ViewBag.Doctors)
+                            {
+                                <option value="@doctor.Id">@doctor.FullName - @doctor.Specialty?.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Ngày khám (*)</label>
+                        <input type="date" id="workDate" name="workDate" class="form-control form-control-lg" required min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Giờ khám (*)</label>
+                        <select id="appointmentTime" name="appointmentTime" class="form-select form-select-lg" required disabled>
+                            <option value="">-- Chọn giờ --</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Triệu chứng (nếu có)</label>
+                        <textarea name="symptoms" class="form-control" rows="3" placeholder="Mô tả triệu chứng..."></textarea>
+                    </div>
+                    <div class="mb-4 form-check">
+                        <input type="checkbox" class="form-check-input" id="recaptchaBooking" required>
+                        <label class="form-check-label" for="recaptchaBooking">Tôi không phải là người máy</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold">XÁC NHẬN ĐẶT LỊCH</button>
+                    <p class="text-center text-muted mt-3 mb-0 small">
+                        (*) Đặt mua gói khám ngay tại đây<br>
+                        <a href="#" class="text-decoration-none">>>> online.benhvienphuongdong.vn</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            function loadSlots() {
+                var doctorId = $('#doctorId').val();
+                var workDate = $('#workDate').val();
+                if (doctorId && workDate) {
+                    $.get('/Appointments/GetAvailableSlots', { doctorId: doctorId, date: workDate }, function(data) {
+                        var slotSelect = $('#appointmentTime');
+                        slotSelect.empty();
+                        slotSelect.append('<option value="">-- Chọn giờ --</option>');
+                        if (data.slots && data.slots.length > 0) {
+                            $.each(data.slots, function(i, slot) {
+                                slotSelect.append('<option value="' + slot + '">' + slot + '</option>');
+                            });
+                            slotSelect.prop('disabled', false);
+                        } else {
+                            slotSelect.append('<option value="">Không có slot trống</option>');
+                            slotSelect.prop('disabled', true);
+                        }
+                    }).fail(function() {
+                        alert('Lỗi khi lấy slot trống!');
+                    });
+                } else {
+                    $('#appointmentTime').prop('disabled', true);
+                }
+            }
+            $('#doctorId, #workDate').change(loadSlots);
+        });
+    </script>
+}

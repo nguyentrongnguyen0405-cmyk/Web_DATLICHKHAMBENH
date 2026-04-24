@@ -1,0 +1,85 @@
+﻿@model Web_Đặt_lịch_phòng_khám.Models.Specialty
+@{
+    ViewData["Title"] = Model.Name;
+    var features = Model.Features?.Split(';', StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
+    var tests = Model.Tests?.Split(';', StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
+    var benefits = Model.Benefits?.Split(';', StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
+}
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a asp-action="Services">Dịch vụ</a></li>
+            <li class="breadcrumb-item active">@Model.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Name" style="max-height: 350px; object-fit: cover;" onerror="this.onerror=null;this.src='https://placehold.co/800x400'">
+                <div class="card-body">
+                    <h2 class="card-title">@Model.Name</h2>
+                    <h5 class="text-primary">💰 Giá: @Model.Price</h5>
+                    <p class="lead mt-3">@Model.ShortDescription</p>
+                    <p>@Model.FullDescription</p>
+
+                    @if (features.Any())
+                    {
+                        <h5><i class="fas fa-list-check"></i> Nội dung dịch vụ:</h5>
+                        <ul class="list-group list-group-flush mb-3">
+                            @foreach (var item in features)
+                            {
+                                <li class="list-group-item bg-transparent">✔ @item.Trim()</li>
+                            }
+                        </ul>
+                    }
+
+                    @if (tests.Any())
+                    {
+                        <h5><i class="fas fa-flask"></i> Các xét nghiệm bao gồm:</h5>
+                        <ul class="list-group list-group-flush mb-3">
+                            @foreach (var item in tests)
+                            {
+                                <li class="list-group-item bg-transparent">🔬 @item.Trim()</li>
+                            }
+                        </ul>
+                    }
+
+                    @if (benefits.Any())
+                    {
+                        <h5><i class="fas fa-gift"></i> Đặc quyền khi đặt lịch:</h5>
+                        <ul class="list-group list-group-flush mb-3">
+                            @foreach (var item in benefits)
+                            {
+                                <li class="list-group-item bg-transparent">🎯 @item.Trim()</li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white"><h5>📅 Đặt lịch ngay</h5></div>
+                <div class="card-body">
+                    <p><i class="fas fa-clock"></i> Thứ 2 - Thứ 7 (7:30 - 17:30)</p>
+                    <p><i class="fas fa-phone-alt"></i> Hotline: <strong>1900 1717</strong></p>
+                    <p><i class="fas fa-map-marker-alt"></i> 123 Nguyễn Trãi, Quận 1, TP.HCM</p>
+                    <a asp-controller="Appointments" asp-action="Create" class="btn btn-primary w-100">📅 Đặt lịch hẹn</a>
+                </div>
+            </div>
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white"><h5>📞 Tư vấn miễn phí</h5></div>
+                <div class="card-body text-center">
+                    <i class="fas fa-phone-alt fa-3x text-info mb-2"></i>
+                    <h4>1900 1717</h4>
+                    <p>24/7 - Hoàn toàn miễn phí</p>
+                    <a href="https://zalo.me/19001717" class="btn btn-outline-primary w-100"><i class="fab fa-zalo"></i> Tư vấn qua Zalo</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

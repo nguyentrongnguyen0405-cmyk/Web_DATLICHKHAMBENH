@@ -1,0 +1,333 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Web_Đặt_lịch_phòng_khám.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Phòng khám Đặt lịch</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        /* Reset & Font chính */
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background-color: #ffffff;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+        /* Navbar hiện đại */
+        .navbar {
+            background-color: rgba(255,255,255,0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+            padding: 0.8rem 0;
+            transition: all 0.3s;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.6rem;
+            background: linear-gradient(135deg, #0d6efd, #00a1e0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent !important;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: #334155 !important;
+            transition: all 0.2s;
+            margin: 0 0.25rem;
+            border-radius: 40px;
+            padding: 0.5rem 1rem;
+        }
+
+            .nav-link:hover {
+                color: #0d6efd !important;
+                background-color: rgba(13,110,253,0.08);
+            }
+        /* Slider - nền xanh đậm, chữ trắng rõ nét */
+        .carousel-item {
+            background: linear-gradient(135deg, #0056b3 0%, #0077b6 100%);
+            padding: 2rem 0;
+            border-radius: 0 0 2rem 2rem;
+            color: white;
+        }
+
+            .carousel-item .container {
+                min-height: 400px;
+                display: flex;
+                align-items: center;
+            }
+
+            .carousel-item h1,
+            .carousel-item .display-4,
+            .carousel-item p,
+            .carousel-item .lead,
+            .carousel-item .btn-outline-primary {
+                color: #ffffff !important;
+                text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                font-weight: 600;
+            }
+
+            .carousel-item .btn-outline-primary {
+                border-color: white;
+                background: transparent;
+            }
+
+                .carousel-item .btn-outline-primary:hover {
+                    background: white;
+                    color: #0056b3 !important;
+                    text-shadow: none;
+                }
+
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            background-color: #0d6efd;
+            border-radius: 50%;
+            padding: 0.8rem;
+            background-size: 50%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        /* Button gradient */
+        .btn-primary {
+            background: linear-gradient(45deg, #0d6efd, #00a1e0);
+            border: none;
+            border-radius: 40px;
+            padding: 0.7rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 25px -5px rgba(13,110,253,0.4);
+            }
+
+        .btn-outline-primary {
+            border-radius: 40px;
+            border-width: 2px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+            .btn-outline-primary:hover {
+                transform: translateY(-2px);
+                background-color: #0d6efd;
+                color: white;
+            }
+        /* Card bóng đổ */
+        .card {
+            border: none;
+            border-radius: 24px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.02);
+        }
+
+            .card:hover {
+                transform: translateY(-6px);
+                box-shadow: 0 20px 35px -12px rgba(0,0,0,0.12);
+            }
+        /* Footer */
+        .footer {
+            background-color: #0f172a;
+            color: #94a3b8;
+            padding-top: 3rem;
+            padding-bottom: 1.5rem;
+            margin-top: 3rem;
+        }
+
+            .footer h5, .footer h6 {
+                color: #ffffff;
+                font-weight: 600;
+                margin-bottom: 1.2rem;
+            }
+
+            .footer a {
+                color: #cbd5e1;
+                text-decoration: none;
+                transition: all 0.2s;
+            }
+
+                .footer a:hover {
+                    color: #ffffff;
+                    padding-left: 5px;
+                }
+
+        .social-icons a {
+            display: inline-block;
+            width: 38px;
+            height: 38px;
+            line-height: 38px;
+            text-align: center;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+            margin-right: 8px;
+            transition: all 0.2s;
+            color: #cbd5e1;
+        }
+
+            .social-icons a:hover {
+                background: #0d6efd;
+                color: white;
+                transform: translateY(-2px);
+            }
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .carousel-item .container {
+                min-height: auto;
+                padding: 2rem 0;
+            }
+
+            .navbar-brand {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
+        <div class="container">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                🏥 Phòng khám Đặt lịch
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        if (!User.IsInRole("Doctor") && !User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Services">Dịch vụ</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Contact">Liên hệ</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Appointments" asp-action="Create">Đặt lịch</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Appointments" asp-action="MyAppointments">Lịch hẹn của tôi</a></li>
+                        }
+                        @if (User.IsInRole("Doctor"))
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Doctor" asp-action="Dashboard">📊 Bảng điều khiển</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Schedules" asp-action="Index">📆 Quản lý lịch trực</a></li>
+                        }
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    👑 Admin
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="Index">Dashboard</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="Users">Người dùng</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="Specialties">Chuyên khoa</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="Doctors">Bác sĩ</a></li>
+                                </ul>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Services">Dịch vụ</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Contact">Liên hệ</a></li>
+                    }
+                </ul>
+                <partial name="_LoginPartial" />
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-3">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+    </div>
+
+    <main>
+        @RenderBody()
+    </main>
+
+    @{
+        var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+        if (!string.Equals(controller, "Admin", StringComparison.OrdinalIgnoreCase) &&
+        !string.Equals(controller, "Doctor", StringComparison.OrdinalIgnoreCase))
+        {
+            <footer class="footer">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <h5>🏥 Phòng khám Đặt lịch</h5>
+                            <p class="small">Chúng tôi mang đến dịch vụ chăm sóc sức khỏe toàn diện, chất lượng cao với đội ngũ bác sĩ giàu kinh nghiệm và trang thiết bị hiện đại.</p>
+                            <div class="mt-3"><span class="badge bg-primary me-2">Hotline 24/7</span><span class="badge bg-success">Bảo mật thông tin</span></div>
+                        </div>
+                        <div class="col-lg-2 col-md-6 mb-4">
+                            <h6>Liên kết nhanh</h6>
+                            <ul class="list-unstyled">
+                                <li><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+                                <li><a asp-controller="Home" asp-action="Services">Dịch vụ</a></li>
+                                <li><a asp-controller="Appointments" asp-action="Create">Đặt lịch</a></li>
+                                <li><a asp-controller="Home" asp-action="Contact">Liên hệ</a></li>
+                                <li><a asp-controller="Home" asp-action="Privacy">Chính sách</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <h6>Dịch vụ chính</h6>
+                            <ul class="list-unstyled">
+                                <li><a asp-controller="Home" asp-action="ServiceDetail" asp-route-id="kham-tong-quat">Khám tổng quát</a></li>
+                                <li><a asp-controller="Home" asp-action="ServiceDetail" asp-route-id="nhi-khoa">Nhi khoa</a></li>
+                                <li><a asp-controller="Home" asp-action="ServiceDetail" asp-route-id="rang-ham-mat">Răng hàm mặt</a></li>
+                                <li><a asp-controller="Home" asp-action="ServiceDetail" asp-route-id="tim-mach">Tim mạch</a></li>
+                                <li><a asp-controller="Home" asp-action="ServiceDetail" asp-route-id="xet-nghiem">Xét nghiệm</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <h6>Liên hệ</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-map-marker-alt me-2"></i> 123 Đường Nguyễn Trãi, Quận 1, TP.HCM</li>
+                                <li><i class="fas fa-phone-alt me-2"></i> <strong>1900 1717</strong> (Miễn phí)</li>
+                                <li><i class="fas fa-envelope me-2"></i> info@phongkham.com</li>
+                                <li><i class="fas fa-clock me-2"></i> Thứ 2 - Thứ 7: 7:30 - 17:30</li>
+                            </ul>
+                            <div class="social-icons mt-3">
+                                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#"><i class="fab fa-zalo"></i></a>
+                                <a href="#"><i class="fab fa-youtube"></i></a>
+                                <a href="#"><i class="fab fa-instagram"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="my-4" style="border-color: #2c3e50;">
+                    <div class="row">
+                        <div class="col-md-12 text-center">
+                            <p class="small mb-0">&copy; @DateTime.Now.Year Phòng khám Đặt lịch. Tất cả các quyền được bảo lưu.</p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        }
+    }
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
