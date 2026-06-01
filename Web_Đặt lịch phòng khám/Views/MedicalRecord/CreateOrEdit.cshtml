@@ -1,0 +1,197 @@
+﻿@using Web_Đặt_lịch_phòng_khám.Models
+@model MedicalRecord
+@{
+    ViewData["Title"] = "Hồ sơ bệnh án";
+    var appointment = ViewBag.Appointment as Appointment;
+    var isDoctor = User.IsInRole("Doctor") || User.IsInRole("Admin");
+    var isPatient = User.IsInRole("Patient");
+    var medicines = ViewBag.Medicines as List<Medicine>;
+    var medicalHistory = ViewBag.MedicalHistory as List<Appointment>;
+}
+
+<h2>
+    @if (isDoctor)
+    {
+        <span>Hồ sơ bệnh án</span>
+    }
+    else
+    {
+
+        <span>Chi tiết lần khám</span>
+    }
+    - @appointment?.User?.FullName
+</h2>
+<p><strong>Ngày khám:</strong> @appointment?.Schedule?.WorkDate.ToString("dd/MM/yyyy")</p>
+<p><strong>Bác sĩ:</strong> @appointment?.Doctor?.FullName</p>
+
+@if (isDoctor)
+{
+    <form asp-action="UpdateMedicalRecord" method="post">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <div class="mb-3">
+            <label>Chẩn đoán</label>
+            <textarea name="diagnosis" class="form-control" rows="2">@Model.Diagnosis</textarea>
+        </div>
+        <div class="mb-3">
+            <label>Kết quả khám</label>
+            <textarea name="examinationResult" class="form-control" rows="3">@Model.ExaminationResult</textarea>
+        </div>
+        <div class="mb-3">
+            <label>Ghi chú</label>
+            <textarea name="notes" class="form-control" rows="2">@Model.Notes</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Lưu hồ sơ</button>
+        <a asp-action="MyAppointments" asp-controller="Appointments" class="btn btn-secondary">Quay lại</a>
+    </form>
+
+    <hr />
+    <h4>Đơn thuốc</h4>
+    <form asp-action="AddPrescription" method="post" class="row g-2 mb-3">
+        <input type="hidden" name="medicalRecordId" value="@Model.Id" />
+        <div class="col-md-3">
+            <select name="medicineId" class="form-select" required>
+                <option value="">-- Chọn thuốc --</option>
+                @if (medicines != null)
+                {
+                    @foreach (var med in medicines)
+                    {
+                        <option value="@med.Id">@med.Name - @med.Price.ToString("N0") đ/@med.Unit</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-2"><input type="text" name="dosage" class="form-control" placeholder="Liều lượng" /></div>
+        <div class="col-md-3"><input type="text" name="instructions" class="form-control" placeholder="Hướng dẫn" /></div>
+        <div class="col-md-1"><input type="number" name="quantity" class="form-control" placeholder="SL" value="1" /></div>
+        <div class="col-md-2"><button type="submit" class="btn btn-success">Thêm</button></div>
+    </form>
+
+   @if (Model.Prescriptions != null && Model.Prescriptions.Any())
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Tên thuốc</th>
+                <th>Liều lượng</th>
+                <th>Hướng dẫn</th>
+                <th>Số lượng</th>
+                <th>Đơn vị</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Prescriptions)
+            {
+                <tr>
+                    <td>@(item.Medicine?.Name ?? "N/A")</td
+                    <td>@item.Dosage</td
+                    <td>@item.Instructions</td
+                    <td>@item.Quantity</td
+                    <td>@item.Unit</td
+                    <td>
+                        <form asp-action="DeletePrescription" method="post">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                        </form>
+                    </td
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Chưa có đơn thuốc.</p>
+}
+}
+else if (isPatient)
+{
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white"><h4>Hồ sơ lần khám này</h4></div>
+        <div class="card-body">
+            <p><strong>Chẩn đoán:</strong> @(Model.Diagnosis ?? "Chưa có")</p>
+            <p><strong>Kết quả khám:</strong> @(Model.ExaminationResult ?? "Chưa có")</p>
+            <p><strong>Ghi chú:</strong> @(Model.Notes ?? "Chưa có")</p>
+            @if (Model.Prescriptions != null && Model.Prescriptions.Any())
+            {
+                <h5>Đơn thuốc</h5>
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr><th>Tên thuốc</th><th>Liều lượng</th><th>Hướng dẫn</th><th>Số lượng</th><th>Đơn vị</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var pres in Model.Prescriptions)
+                        {
+                            <tr>
+                                <td>@pres.Medicine?.Name</td>
+                                <td>@pres.Dosage</td>
+                                <td>@pres.Instructions</td>
+                                <td>@pres.Quantity</td>
+                                <td>@pres.Unit</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="text-muted">Chưa có đơn thuốc.</p>
+            }
+        </div>
+    </div>
+
+    @if (medicalHistory != null && medicalHistory.Any())
+    {
+        <h4>📜 Lịch sử khám bệnh trước đây</h4>
+        <div class="accordion" id="historyAccordion">
+            @foreach (var oldApp in medicalHistory)
+            {
+                var oldRecord = oldApp.MedicalRecord;
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading_@oldApp.Id">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_@oldApp.Id">
+                            <strong>@oldApp.Schedule?.WorkDate.ToString("dd/MM/yyyy")</strong> - @oldApp.Doctor?.FullName (@oldApp.Doctor?.Specialty?.Name)
+                        </button>
+                    </h2>
+                    <div id="collapse_@oldApp.Id" class="accordion-collapse collapse" data-bs-parent="#historyAccordion">
+                        <div class="accordion-body">
+                            @if (oldRecord != null)
+                            {
+                                <p><strong>Chẩn đoán:</strong> @oldRecord.Diagnosis</p>
+                                <p><strong>Kết quả:</strong> @oldRecord.ExaminationResult</p>
+                                <p><strong>Ghi chú:</strong> @oldRecord.Notes</p>
+                                if (oldRecord.Prescriptions != null && oldRecord.Prescriptions.Any())
+                                {
+                                    <h5>Đơn thuốc</h5>
+                                    <table class="table table-sm table-bordered">
+                                        <thead><tr><th>Tên thuốc</th><th>Liều lượng</th><th>Hướng dẫn</th><th>Số lượng</th><th>Đơn vị</th></tr></thead>
+                                        <tbody>
+                                            @foreach (var pres in oldRecord.Prescriptions)
+                                            {
+                                                <tr>
+                                                    <td>@pres.Medicine?.Name</td>
+                                                    <td>@pres.Dosage</td>
+                                                    <td>@pres.Instructions</td>
+                                                    <td>@pres.Quantity</td>
+                                                    <td>@pres.Unit</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                            }
+                            else
+                            {
+                                <p class="text-muted">Chưa có hồ sơ bệnh án.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-muted">Chưa có lịch sử khám trước đây.</p>
+    }
+}

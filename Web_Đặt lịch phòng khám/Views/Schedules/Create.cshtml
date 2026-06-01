@@ -1,12 +1,26 @@
-﻿@model Web_Đặt_lịch_phòng_khám.Models.Schedule
-@{
-    ViewData["Title"] = "Thêm lịch trực";
+﻿@{
+    ViewData["Title"] = "Thêm lịch trực mới";
 }
-<h2>➕ Thêm lịch trực</h2>
+
+<h2>@ViewData["Title"]</h2>
+
 <form asp-action="Create" method="post">
-    <div class="mb-3"><label class="form-label">Ngày</label><input asp-for="WorkDate" type="date" class="form-control" required /></div>
-    <div class="mb-3"><label class="form-label">Bắt đầu</label><input asp-for="StartTime" type="time" class="form-control" required /></div>
-    <div class="mb-3"><label class="form-label">Kết thúc</label><input asp-for="EndTime" type="time" class="form-control" required /></div>
-    <button type="submit" class="btn btn-success">Lưu</button>
+    <div class="mb-3">
+        <label>Ngày làm việc</label>
+        <input type="date" name="workDate" class="form-control" required min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="mb-3">
+        <label>Giờ bắt đầu</label>
+        <input type="time" name="startTime" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label>Giờ kết thúc</label>
+        <input type="time" name="endTime" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label>Số bệnh nhân tối đa</label>
+        <input type="number" name="maxPatients" class="form-control" value="5" min="1" />
+    </div>
+    <button type="submit" class="btn btn-primary">Thêm lịch</button>
     <a asp-action="Index" class="btn btn-secondary">Hủy</a>
 </form>

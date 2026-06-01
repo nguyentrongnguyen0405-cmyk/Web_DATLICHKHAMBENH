@@ -1,0 +1,70 @@
+﻿@model IEnumerable<Web_Đặt_lịch_phòng_khám.Models.Specialty>
+@{
+    ViewData["Title"] = "Quản lý chuyên khoa";
+}
+
+<h2>Quản lý chuyên khoa</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addSpecialtyModal">
+    + Thêm chuyên khoa
+</button>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Tên chuyên khoa</th>
+            <th>Mô tả</th>
+            <th>Hành động</th>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Description</td>
+                <td>
+                    <form asp-action="DeleteSpecialty" method="post" onsubmit="return confirm('Bạn có chắc muốn xóa chuyên khoa này?');">
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Modal thêm chuyên khoa -->
+<div class="modal fade" id="addSpecialtyModal" tabindex="-1" aria-labelledby="addSpecialtyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="AddSpecialty" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addSpecialtyModalLabel">Thêm chuyên khoa mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Tên chuyên khoa</label>
+                        <input type="text" name="Name" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mô tả</label>
+                        <textarea name="Description" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

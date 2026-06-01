@@ -1,0 +1,159 @@
+﻿@{
+    ViewData["Title"] = "Doanh thu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .stat-card {
+        background: white;
+        border-radius: 24px;
+        padding: 20px;
+        text-align: center;
+        border: 1px solid #eef2ff;
+        transition: all 0.25s;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+
+    .revenue-table th {
+        background-color: #f8fafc;
+    }
+</style>
+
+<div class="container mt-3">
+    <h2 class="fw-bold mb-4">📊 Doanh thu và chi tiết thanh toán</h2>
+
+    <!-- Card tổng doanh thu -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <i class="fas fa-coins fa-2x text-success mb-2"></i>
+                <h3 class="fw-bold mb-0">@(ViewBag.TotalRevenue != null ? ((decimal)ViewBag.TotalRevenue).ToString("N0") : "0") VNĐ</h3>
+                <p class="text-muted mb-0">Tổng doanh thu</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <i class="fas fa-receipt fa-2x text-primary mb-2"></i>
+                <h3 class="fw-bold mb-0">@(ViewBag.PaidAppointments != null ? ((IEnumerable<dynamic>)ViewBag.PaidAppointments).Count() : 0)</h3>
+                <p class="text-muted mb-0">Số hóa đơn</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <i class="fas fa-chart-line fa-2x text-info mb-2"></i>
+                <h3 class="fw-bold mb-0">
+                    @{
+                        var total = ViewBag.TotalRevenue != null ? (decimal)ViewBag.TotalRevenue : 0;
+                        var count = ViewBag.PaidAppointments != null ? ((IEnumerable<dynamic>)ViewBag.PaidAppointments).Count() : 0;
+                        var avg = count > 0 ? total / count : 0;
+                    }
+                    @avg.ToString("N0") VNĐ
+                </h3>
+                <p class="text-muted mb-0">Trung bình/hóa đơn</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doanh thu theo khung giờ -->
+    <h3 class="mt-4 mb-3">📈 Doanh thu theo khung giờ</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped revenue-table">
+            <thead>
+                <tr><th>Giờ</th><th>Số lượng</th><th>Doanh thu (VNĐ)</th><th>Trung bình / hóa đơn</th></tr>
+            </thead>
+            <tbody>
+                @if (ViewBag.HourlyRevenue != null)
+                {
+                    foreach (var item in ViewBag.HourlyRevenue)
+                    {
+                        <tr>
+                            <td>@item.Hour:00 - @(item.Hour + 1):00</td>
+                            <td>@item.Count</td>
+                            <td>@item.Total.ToString("N0")</td>
+                            <td>@(item.Count > 0 ? (item.Total / item.Count).ToString("N0") : "0")</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="4" class="text-center">Chưa có dữ liệu thanh toán</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Doanh thu theo ngày -->
+    <h3 class="mt-5 mb-3">📅 Doanh thu theo ngày</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped revenue-table">
+            <thead>
+                <tr><th>Ngày</th><th>Số lượng</th><th>Doanh thu (VNĐ)</th><th>Trung bình / hóa đơn</th></tr>
+            </thead>
+            <tbody>
+                @if (ViewBag.DailyRevenue != null)
+                {
+                    foreach (var item in ViewBag.DailyRevenue)
+                    {
+                        <tr>
+                            <td>@item.Date.ToString("dd/MM/yyyy")</td>
+                            <td>@item.Count</td>
+                            <td>@item.Total.ToString("N0")</td>
+                            <td>@(item.Count > 0 ? (item.Total / item.Count).ToString("N0") : "0")</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="4" class="text-center">Chưa có dữ liệu thanh toán</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Danh sách hóa đơn chi tiết -->
+    <h3 class="mt-5 mb-3">📄 Hóa đơn chi tiết (đã thanh toán)</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Mã hóa đơn</th>
+                    <th>Bệnh nhân</th>
+                    <th>Bác sĩ</th>
+                    <th>Ngày khám</th>
+                    <th>Giờ khám</th>
+                    <th>Số tiền</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (ViewBag.PaidAppointments != null)
+                {
+                    foreach (var item in ViewBag.PaidAppointments)
+                    {
+                        <tr>
+                            <td>INV-@item.Id.ToString("D6")</td>
+                            <td>@(item.User?.FullName ?? "N/A")</td>
+                            <td>@(item.Doctor?.FullName ?? "N/A")</td>
+                            <td>@(item.Schedule?.WorkDate.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                            <td>@(item.Schedule?.StartTime.ToString(@"hh\:mm") ?? "N/A")</td>
+                            <td>@(item.ConsultationFee?.ToString("N0") ?? "0") VNĐ</td>
+                            <td>
+                                <a asp-controller="Appointments" asp-action="ExportInvoice" asp-route-id="@item.Id" class="btn btn-sm btn-secondary">
+                                    <i class="fas fa-file-pdf"></i> Xuất hóa đơn
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="7" class="text-center">Chưa có hóa đơn nào được thanh toán</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

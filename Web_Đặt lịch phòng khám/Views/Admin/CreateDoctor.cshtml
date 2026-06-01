@@ -1,0 +1,41 @@
+﻿@model Web_Đặt_lịch_phòng_khám.Models.Doctor
+@{
+    ViewData["Title"] = "Thêm bác sĩ";
+}
+<h2>Thêm bác sĩ mới</h2>
+<form asp-action="CreateDoctor" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="mb-3">
+        <label class="form-label">Email (tên đăng nhập)</label>
+        <input type="email" name="email" class="form-control" required />
+        <small class="text-muted">Email sẽ dùng để đăng nhập, mật khẩu mặc định: Doctor@123</small>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Họ tên bác sĩ</label>
+        <input type="text" name="fullName" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Chuyên khoa</label>
+        <select name="specialtyId" class="form-select" required>
+            <option value="">-- Chọn chuyên khoa --</option>
+            @foreach (var item in ViewBag.Specialties)
+            {
+                <option value="@item.Id">@item.Name</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Học hàm, học vị</label>
+        <input type="text" name="qualifications" class="form-control" placeholder="VD: Tiến sĩ Y khoa, Thạc sĩ..." />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Số năm kinh nghiệm</label>
+        <input type="number" name="experienceYears" class="form-control" value="0" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Phí khám (VNĐ)</label>
+        <input type="number" name="consultationFee" class="form-control" value="0" />
+    </div>
+    <button type="submit" class="btn btn-primary">Thêm bác sĩ</button>
+    <a asp-action="Doctors" class="btn btn-secondary">Hủy</a>
+</form>

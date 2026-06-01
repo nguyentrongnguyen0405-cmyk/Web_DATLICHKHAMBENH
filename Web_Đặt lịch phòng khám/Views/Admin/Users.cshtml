@@ -1,0 +1,43 @@
+﻿
+@model List<Web_Đặt_lịch_phòng_khám.Controllers.UserRoleViewModel>
+@{
+    ViewData["Title"] = "Quản lý người dùng";
+}
+<h2>Quản lý người dùng</h2>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Họ tên</th>
+            <th>Ngày sinh</th>
+            <th>Giới tính</th>
+            <th>Trạng thái</th>
+            <th>Role hiện tại</th>
+            <th>Gán role</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.User.Email</td>
+                <td>@item.User.FullName</td>
+                <td>@(item.User.DateOfBirth?.ToString("dd/MM/yyyy") ?? "Chưa cập nhật")</td>
+                <td>@(item.User.Gender ?? "Chưa cập nhật")</td>
+                <td>@(item.User.IsActive ? "Hoạt động" : "Khóa")</td>
+                <td>@string.Join(", ", item.Roles)</td>
+                <td>
+                    <form method="post" asp-action="AssignRole">
+                        <input type="hidden" name="userId" value="@item.User.Id" />
+                        <select name="role" class="form-select form-select-sm d-inline-block w-auto">
+                            <option value="Patient">Patient</option>
+                            <option value="Doctor">Doctor</option>
+                            <option value="Admin">Admin</option>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">Gán</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

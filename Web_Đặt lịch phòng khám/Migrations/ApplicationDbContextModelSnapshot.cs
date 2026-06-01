@@ -167,11 +167,20 @@ namespace Web_Đặt_lịch_phòng_khám.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AvatarUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
@@ -183,6 +192,12 @@ namespace Web_Đặt_lịch_phòng_khám.Migrations
 
                     b.Property<string>("FullName")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Gender")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -206,9 +221,6 @@ namespace Web_Đặt_lịch_phòng_khám.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Role")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -241,22 +253,34 @@ namespace Web_Đặt_lịch_phòng_khám.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal?>("ConsultationFee")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("DoctorId")
                         .HasColumnType("int");
 
+                    b.Property<string>("PaymentMethod")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentStatus")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("ScheduleId")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Symptoms")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -279,6 +303,7 @@ namespace Web_Đặt_lịch_phòng_khám.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("ConsultationFee")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ExperienceYears")
@@ -289,6 +314,7 @@ namespace Web_Đặt_lịch_phòng_khám.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Qualifications")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("SpecialtyId")
@@ -304,6 +330,73 @@ namespace Web_Đặt_lịch_phòng_khám.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Doctors", (string)null);
+                });
+
+            modelBuilder.Entity("Web_Đặt_lịch_phòng_khám.Models.MedicalRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AppointmentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Diagnosis")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ExaminationResult")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppointmentId")
+                        .IsUnique();
+
+                    b.ToTable("MedicalRecords", (string)null);
+                });
+
+            modelBuilder.Entity("Web_Đặt_lịch_phòng_khám.Models.Prescription", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Dosage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Instructions")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MedicalRecordId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MedicineName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Unit")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MedicalRecordId");
+
+                    b.ToTable("Prescriptions", (string)null);
                 });
 
             modelBuilder.Entity("Web_Đặt_lịch_phòng_khám.Models.Schedule", b =>
@@ -347,10 +440,33 @@ namespace Web_Đặt_lịch_phòng_khám.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Benefits")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Features")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Price")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ShortDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Tests")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -414,18 +530,20 @@ namespace Web_Đặt_lịch_phòng_khám.Migrations
                     b.HasOne("Web_Đặt_lịch_phòng_khám.Models.Doctor", "Doctor")
                         .WithMany()
                         .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Web_Đặt_lịch_phòng_khám.Models.Schedule", "Schedule")
                         .WithMany()
                         .HasForeignKey("ScheduleId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Web_Đặt_lịch_phòng_khám.Models.ApplicationUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Doctor");
 
@@ -451,6 +569,28 @@ namespace Web_Đặt_lịch_phòng_khám.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Web_Đặt_lịch_phòng_khám.Models.MedicalRecord", b =>
+                {
+                    b.HasOne("Web_Đặt_lịch_phòng_khám.Models.Appointment", "Appointment")
+                        .WithOne("MedicalRecord")
+                        .HasForeignKey("Web_Đặt_lịch_phòng_khám.Models.MedicalRecord", "AppointmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Appointment");
+                });
+
+            modelBuilder.Entity("Web_Đặt_lịch_phòng_khám.Models.Prescription", b =>
+                {
+                    b.HasOne("Web_Đặt_lịch_phòng_khám.Models.MedicalRecord", "MedicalRecord")
+                        .WithMany("Prescriptions")
+                        .HasForeignKey("MedicalRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MedicalRecord");
+                });
+
             modelBuilder.Entity("Web_Đặt_lịch_phòng_khám.Models.Schedule", b =>
                 {
                     b.HasOne("Web_Đặt_lịch_phòng_khám.Models.Doctor", "Doctor")
@@ -460,6 +600,16 @@ namespace Web_Đặt_lịch_phòng_khám.Migrations
                         .IsRequired();
 
                     b.Navigation("Doctor");
+                });
+
+            modelBuilder.Entity("Web_Đặt_lịch_phòng_khám.Models.Appointment", b =>
+                {
+                    b.Navigation("MedicalRecord");
+                });
+
+            modelBuilder.Entity("Web_Đặt_lịch_phòng_khám.Models.MedicalRecord", b =>
+                {
+                    b.Navigation("Prescriptions");
                 });
 
             modelBuilder.Entity("Web_Đặt_lịch_phòng_khám.Models.Specialty", b =>

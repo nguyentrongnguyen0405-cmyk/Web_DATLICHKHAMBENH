@@ -5,24 +5,32 @@ using Web_Đặt_lịch_phòng_khám.Data;
 using Web_Đặt_lịch_phòng_khám.Models;
 using Web_Đặt_lịch_phòng_khám.Services;
 using Web_Đặt_lịch_phòng_khám.Repositories;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Cấu hình Identity với chính sách mật khẩu linh hoạt (chấp nhận mật khẩu vừa đủ mạnh)
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => {
-    options.Password.RequireDigit = false;
-    options.Password.RequiredLength = 6;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = false;
+    options.Password.RequireDigit = true;       // yêu cầu có số
+    options.Password.RequiredLength = 6;        // độ dài tối thiểu 6
+    options.Password.RequireNonAlphanumeric = true; // yêu cầu ký tự đặc biệt ( @, #, $, ... )
+    options.Password.RequireUppercase = true;   // yêu cầu chữ hoa
+    options.Password.RequireLowercase = true;   // yêu cầu chữ thường
 })
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+// Đăng ký các service
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<IQRCodeService, QRCodeService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+builder.Services.AddHttpClient<IOpenAiService, OpenAiService>();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -46,18 +54,20 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
-// Khởi tạo dữ liệu mẫu (chạy 1 lần)
+
+ //Tạm thời comment DbInitializer để tránh lỗi trong quá trình test
 using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    try
-    {
+ {
+     var services = scope.ServiceProvider;
+     try
+     {
         await DbInitializer.InitializeAsync(services);
-        Console.WriteLine("DbInitializer chạy thành công.");
-    }
+         Console.WriteLine("DbInitializer chạy thành công.");
+     }
     catch (Exception ex)
-    {
-        Console.WriteLine($"Lỗi khi chạy DbInitializer: {ex.Message}");
-    }
-}
+     {
+         Console.WriteLine($"Lỗi khi chạy DbInitializer: {ex.Message}");
+     }
+ }
+
 app.Run();

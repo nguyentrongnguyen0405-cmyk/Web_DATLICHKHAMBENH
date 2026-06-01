@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Web_Đặt_lịch_phòng_khám.Data;
 using Web_Đặt_lịch_phòng_khám.Models;
+using Web_Đặt_lịch_phòng_khám.Services;
 
 namespace Web_Đặt_lịch_phòng_khám.Controllers
 {
@@ -13,11 +14,13 @@ namespace Web_Đặt_lịch_phòng_khám.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IEmailService _emailService;
 
-        public AppointmentsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public AppointmentsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IEmailService emailService)
         {
             _context = context;
             _userManager = userManager;
+            _emailService = emailService;
         }
 
         // GET: /Appointments/MyAppointments
@@ -27,12 +30,19 @@ namespace Web_Đặt_lịch_phòng_khám.Controllers
             if (user == null) return Challenge();
 
             IQueryable<Appointment> query = _context.Appointments
-                .Include(a => a.Doctor)
-                    .ThenInclude(d => d!.Specialty)
+                .Include(a => a.Doctor)!.ThenInclude(d => d!.Specialty)
                 .Include(a => a.Schedule)
-                .Include(a => a.User); // Lấy thông tin bệnh nhân cho bác sĩ
+                .Include(a => a.User)
+                .Include(a => a.MedicalRecord)!
+                    .ThenInclude(m => m!.Prescriptions)!
+                    .ThenInclude(p => p!.Medicine);
 
-            if (User.IsInRole("Doctor"))
+            if (User.IsInRole("Admin"))
+            {
+                ViewBag.IsDoctor = false;
+                ViewBag.Title = "Tất cả lịch hẹn";
+            }
+            else if (User.IsInRole("Doctor"))
             {
                 var doctor = await _context.Doctors.FirstOrDefaultAsync(d => d.UserId == user.Id);
                 if (doctor == null) return NotFound("Không tìm thấy thông tin bác sĩ.");
@@ -57,10 +67,13 @@ namespace Web_Đặt_lịch_phòng_khám.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(int appointmentId, string status)
         {
-            var appointment = await _context.Appointments.FindAsync(appointmentId);
+            var appointment = await _context.Appointments
+                .Include(a => a.User)
+                .Include(a => a.Doctor)
+                .Include(a => a.Schedule)
+                .FirstOrDefaultAsync(a => a.Id == appointmentId);
             if (appointment == null) return NotFound();
 
-            // Kiểm tra bác sĩ có quyền với lịch hẹn này không
             var user = await _userManager.GetUserAsync(User);
             var doctor = await _context.Doctors.FirstOrDefaultAsync(d => d.UserId == user.Id);
             if (doctor == null || appointment.DoctorId != doctor.Id)
@@ -71,6 +84,32 @@ namespace Web_Đặt_lịch_phòng_khám.Controllers
                 appointment.Status = status;
                 await _context.SaveChangesAsync();
                 TempData["Success"] = $"Đã cập nhật trạng thái thành {(status == "confirmed" ? "Đã xác nhận" : "Đã hủy")}.";
+
+                if (status == "confirmed")
+                {
+                    string? email = appointment.User?.Email;
+                    if (!string.IsNullOrEmpty(email))
+                    {
+                        await _emailService.SendEmailAsync(email, "Lịch hẹn đã được xác nhận",
+                            $@"
+                            <h3>Lịch hẹn của bạn đã được xác nhận!</h3>
+                            <p>Bác sĩ <strong>{appointment.Doctor?.FullName}</strong> đã xác nhận lịch hẹn vào ngày <strong>{appointment.Schedule?.WorkDate:dd/MM/yyyy}</strong> lúc <strong>{appointment.Schedule?.StartTime}</strong>.</p>
+                            <p>Vui lòng đến đúng giờ.</p>
+                            ");
+                    }
+                }
+                else if (status == "cancelled")
+                {
+                    string? email = appointment.User?.Email;
+                    if (!string.IsNullOrEmpty(email))
+                    {
+                        await _emailService.SendEmailAsync(email, "Lịch hẹn bị hủy",
+                            $@"
+                            <h3>Lịch hẹn của bạn đã bị hủy</h3>
+                            <p>Rất tiếc, lịch hẹn với bác sĩ <strong>{appointment.Doctor?.FullName}</strong> vào ngày <strong>{appointment.Schedule?.WorkDate:dd/MM/yyyy}</strong> lúc <strong>{appointment.Schedule?.StartTime}</strong> đã bị hủy. Vui lòng đặt lịch lại.</p>
+                            ");
+                    }
+                }
             }
             else
             {
@@ -79,8 +118,155 @@ namespace Web_Đặt_lịch_phòng_khám.Controllers
             return RedirectToAction(nameof(MyAppointments));
         }
 
+        // POST: /Appointments/Delete
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var appointment = await _context.Appointments.FindAsync(id);
+            if (appointment == null) return NotFound();
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            var isOwner = appointment.UserId == user.Id;
+            var isDoctor = false;
+            var isAdmin = User.IsInRole("Admin");
+            if (User.IsInRole("Doctor"))
+            {
+                var doctor = await _context.Doctors.FirstOrDefaultAsync(d => d.UserId == user.Id);
+                if (doctor != null && appointment.DoctorId == doctor.Id)
+                    isDoctor = true;
+            }
+
+            if (!isOwner && !isDoctor && !isAdmin)
+                return Forbid();
+
+            _context.Appointments.Remove(appointment);
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Đã xóa lịch hẹn thành công.";
+            return RedirectToAction(nameof(MyAppointments));
+        }
+
+        // POST: /Appointments/UpdatePaymentStatus
+        [HttpPost]
+        [Authorize(Roles = "Doctor,Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdatePaymentStatus(int appointmentId)
+        {
+            var appointment = await _context.Appointments.FindAsync(appointmentId);
+            if (appointment == null) return NotFound();
+
+            var user = await _userManager.GetUserAsync(User);
+            if (User.IsInRole("Doctor"))
+            {
+                var doctor = await _context.Doctors.FirstOrDefaultAsync(d => d.UserId == user.Id);
+                if (doctor == null || appointment.DoctorId != doctor.Id)
+                    return Forbid();
+            }
+
+            if (appointment.PaymentStatus == "Paid")
+            {
+                TempData["Error"] = "Lịch hẹn này đã được thanh toán.";
+                return RedirectToAction(nameof(MyAppointments));
+            }
+
+            appointment.PaymentStatus = "Paid";
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Đã cập nhật trạng thái thanh toán thành Đã thanh toán.";
+            return RedirectToAction(nameof(MyAppointments));
+        }
+
+        // GET: /Appointments/ExportInvoice/{id}
+        [Authorize(Roles = "Doctor,Admin")]
+        public async Task<IActionResult> ExportInvoice(int id)
+        {
+            var appointment = await _context.Appointments
+                .Include(a => a.Doctor)!.ThenInclude(d => d!.Specialty)
+                .Include(a => a.User)
+                .Include(a => a.Schedule)
+                .Include(a => a.MedicalRecord)!
+                    .ThenInclude(m => m!.Prescriptions)!
+                    .ThenInclude(p => p!.Medicine)
+                .FirstOrDefaultAsync(a => a.Id == id);
+            if (appointment == null) return NotFound();
+
+            if (appointment.PaymentStatus != "Paid")
+                return BadRequest("Lịch hẹn chưa được thanh toán, không thể xuất hóa đơn.");
+
+            decimal totalMedicine = 0;
+            if (appointment.MedicalRecord?.Prescriptions != null)
+            {
+                totalMedicine = appointment.MedicalRecord.Prescriptions.Sum(p => p.Quantity * p.Price);
+            }
+            decimal totalAmount = (appointment.ConsultationFee ?? 0) + totalMedicine;
+
+            var prescriptionsHtml = "";
+            if (appointment.MedicalRecord?.Prescriptions != null && appointment.MedicalRecord.Prescriptions.Any())
+            {
+                foreach (var p in appointment.MedicalRecord.Prescriptions)
+                {
+                    prescriptionsHtml += $@"
+                    <tr>
+                        <td>{p.Medicine?.Name}</td>
+                        <td>{p.Quantity}</td>
+                        <td>{p.Price:N0} VNĐ</td>
+                        <td>{(p.Quantity * p.Price):N0} VNĐ</td>
+                    </tr>";
+                }
+            }
+            else
+            {
+                prescriptionsHtml = "<tr><td colspan='4'>Không có thuốc</td></tr>";
+            }
+
+            var htmlContent = $@"
+            <html>
+            <head><meta charset='utf-8'/><title>Hóa đơn khám bệnh</title>
+            <style>
+                body{{font-family:Arial;padding:20px}}
+                h2,h3{{text-align:center}}
+                table{{width:100%;border-collapse:collapse;margin:15px 0}}
+                th,td{{border:1px solid #ddd;padding:8px;text-align:left}}
+                th{{background:#f2f2f2}}
+            </style>
+            </head>
+            <body>
+                <h2>PHÒNG KHÁM ĐẶT LỊCH</h2>
+                <h3>HÓA ĐƠN KHÁM BỆNH</h3>
+                <hr/>
+                <p><strong>Mã hóa đơn:</strong> INV-{appointment.Id:D6}</p>
+                <p><strong>Ngày lập:</strong> {DateTime.Now:dd/MM/yyyy HH:mm}</p>
+                <p><strong>Bệnh nhân:</strong> {appointment.User?.FullName} ({appointment.User?.Email})</p>
+                <p><strong>Bác sĩ:</strong> {appointment.Doctor?.FullName}</p>
+                <p><strong>Chuyên khoa:</strong> {appointment.Doctor?.Specialty?.Name}</p>
+                <p><strong>Ngày khám:</strong> {appointment.Schedule?.WorkDate:dd/MM/yyyy}</p>
+                <p><strong>Giờ khám:</strong> {appointment.Schedule?.StartTime} - {appointment.Schedule?.EndTime}</p>
+                <h4>Đơn thuốc</h4>
+                <table>
+                    <thead>
+                        <tr><th>Tên thuốc</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th></tr>
+                    </thead>
+                    <tbody>
+                        {prescriptionsHtml}
+                    </tbody>
+                </table>
+                <p><strong>Phí khám:</strong> {(appointment.ConsultationFee ?? 0):N0} VNĐ</p>
+                <p><strong>Tổng tiền thuốc:</strong> {totalMedicine:N0} VNĐ</p>
+                <p><strong>Tổng thanh toán:</strong> {totalAmount:N0} VNĐ</p>
+                <p><strong>Trạng thái thanh toán:</strong> Đã thanh toán</p>
+                <hr/>
+                <p style='text-align:center'>Cảm ơn quý khách đã sử dụng dịch vụ!</p>
+            </body>
+            </html>";
+
+            return Content(htmlContent, "text/html");
+        }
+
         // GET: /Appointments/Create
         [HttpGet]
+        [Authorize(Roles = "Patient")]
         public async Task<IActionResult> Create()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -97,6 +283,7 @@ namespace Web_Đặt_lịch_phòng_khám.Controllers
 
         // POST: /Appointments/Create
         [HttpPost]
+        [Authorize(Roles = "Patient")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(int doctorId, DateTime workDate, string appointmentTime, string? symptoms)
         {
@@ -120,16 +307,24 @@ namespace Web_Đặt_lịch_phòng_khám.Controllers
                 return View();
             }
 
-            // Kiểm tra xem khung giờ đã được đặt chưa
-            var existingAppointment = await _context.Appointments
-                .FirstOrDefaultAsync(a => a.ScheduleId == schedule.Id);
-            if (existingAppointment != null)
+            // Kiểm tra số bệnh nhân hiện tại
+            var currentPatients = await _context.Appointments.CountAsync(a => a.ScheduleId == schedule.Id);
+            if (currentPatients >= schedule.MaxPatients)
             {
-                ModelState.AddModelError("", "Khung giờ này đã có người đặt. Vui lòng chọn giờ khác.");
+                ModelState.AddModelError("", "Khung giờ này đã đủ bệnh nhân. Vui lòng chọn giờ khác.");
                 await LoadDoctorsToViewBag();
                 return View();
             }
 
+            var existingAppointment = await _context.Appointments.FirstOrDefaultAsync(a => a.ScheduleId == schedule.Id && a.UserId == user.Id);
+            if (existingAppointment != null)
+            {
+                ModelState.AddModelError("", "Bạn đã đặt lịch trong khung giờ này rồi.");
+                await LoadDoctorsToViewBag();
+                return View();
+            }
+
+            var doctor = await _context.Doctors.FindAsync(doctorId);
             var appointment = new Appointment
             {
                 UserId = user.Id,
@@ -137,11 +332,22 @@ namespace Web_Đặt_lịch_phòng_khám.Controllers
                 ScheduleId = schedule.Id,
                 Symptoms = symptoms ?? string.Empty,
                 Status = "pending",
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                ConsultationFee = doctor?.ConsultationFee ?? 0,
+                PaymentStatus = "Pending"
             };
 
             _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync();
+
+            var doctorName = doctor?.FullName ?? "Bác sĩ";
+            await _emailService.SendEmailAsync(user.Email, "Xác nhận đặt lịch",
+                $@"
+                <h3>Cảm ơn bạn đã đặt lịch!</h3>
+                <p>Bạn đã đặt lịch với bác sĩ <strong>{doctorName}</strong> vào ngày <strong>{workDate:dd/MM/yyyy}</strong> lúc <strong>{appointmentTime}</strong>.</p>
+                <p>Vui lòng chờ bác sĩ xác nhận. Bạn có thể theo dõi trạng thái trong mục <a href='/Appointments/MyAppointments'>Lịch hẹn của tôi</a>.</p>
+                <p>Trân trọng,<br/>Phòng khám Đặt lịch</p>
+                ");
 
             TempData["Success"] = "Đặt lịch thành công!";
             return RedirectToAction(nameof(MyAppointments));
@@ -155,18 +361,39 @@ namespace Web_Đặt_lịch_phòng_khám.Controllers
                 .Where(s => s.DoctorId == doctorId && s.WorkDate.Date == date.Date && s.IsActive == true)
                 .ToListAsync();
 
-            var bookedScheduleIds = await _context.Appointments
+            var bookedCounts = await _context.Appointments
                 .Where(a => a.Schedule != null && a.Schedule.DoctorId == doctorId && a.Schedule.WorkDate.Date == date.Date)
-                .Select(a => a.ScheduleId)
-                .ToListAsync();
+                .GroupBy(a => a.ScheduleId)
+                .Select(g => new { ScheduleId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(k => k.ScheduleId, v => v.Count);
 
             var availableSlots = schedules
-                .Where(s => !bookedScheduleIds.Contains(s.Id))
+                .Where(s => !bookedCounts.ContainsKey(s.Id) || bookedCounts[s.Id] < s.MaxPatients)
                 .Select(s => s.StartTime.ToString(@"hh\:mm"))
                 .OrderBy(t => t)
                 .ToList();
 
             return Json(new { slots = availableSlots });
+        }
+
+        // GET: /Appointments/MedicalHistory
+        [Authorize(Roles = "Patient")]
+        public async Task<IActionResult> MedicalHistory()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            var appointments = await _context.Appointments
+                .Where(a => a.UserId == user.Id && (a.Status == "confirmed" || a.Status == "completed"))
+                .Include(a => a.Doctor)!.ThenInclude(d => d!.Specialty)
+                .Include(a => a.Schedule)
+                .Include(a => a.MedicalRecord)!
+                    .ThenInclude(m => m!.Prescriptions)!
+                    .ThenInclude(p => p!.Medicine)
+                .OrderByDescending(a => a.Schedule!.WorkDate)
+                .ToListAsync();
+
+            return View(appointments);
         }
 
         private async Task LoadDoctorsToViewBag()

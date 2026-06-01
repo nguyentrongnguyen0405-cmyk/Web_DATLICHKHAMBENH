@@ -1,22 +1,84 @@
-﻿@model IEnumerable<Web_Đặt_lịch_phòng_khám.Models.Schedule>
-@{
-    ViewData["Title"] = "Quản lý lịch trực";
+﻿@{
+    ViewData["Title"] = "Quản lý lịch trực (Thời khóa biểu)";
+    var weekDays = ViewBag.WeekDays as List<DateTime>;
+    var timeSlots = ViewBag.TimeSlots as List<TimeSpan>;
+    var schedules = ViewBag.Schedules as Dictionary<(DateTime date, TimeSpan start), Schedule>;
+    var appointmentCounts = ViewBag.AppointmentCounts as Dictionary<int, int> ?? new Dictionary<int, int>();
+    var doctorId = ViewBag.DoctorId;
+    var currentWeekStart = (DateTime)ViewBag.CurrentWeekStart;
+    var prevWeek = (DateTime)ViewBag.PrevWeek;
+    var nextWeek = (DateTime)ViewBag.NextWeek;
 }
-<h2>📆 Quản lý lịch trực</h2>
-<p><a asp-action="Create" class="btn btn-primary">+ Thêm lịch trực mới</a></p>
-<table class="table table-bordered table-hover">
-    <thead class="table-light">
-        <tr><th>Ngày</th><th>Bắt đầu</th><th>Kết thúc</th><th>Trạng thái</th></tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="mb-3">
+    <a href="@Url.Action("Index", new { currentWeekStart = prevWeek })" class="btn btn-secondary">&laquo; Tuần trước</a>
+    <a href="@Url.Action("Index", new { currentWeekStart = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek + (int)DayOfWeek.Monday) })" class="btn btn-outline-primary">Tuần hiện tại</a>
+    <a href="@Url.Action("Index", new { currentWeekStart = nextWeek })" class="btn btn-secondary">Tuần sau &raquo;</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered text-center align-middle">
+        <thead class="table-light">
             <tr>
-                <td>@item.WorkDate.ToString("dd/MM/yyyy")</td>
-                <td>@item.StartTime</td>
-                <td>@item.EndTime</td>
-                <td>@(item.IsActive ? "🟢 Có sẵn" : "🔴 Đã khóa")</td>
+                <th>Giờ / Ngày</th>
+                @foreach (var day in weekDays)
+                {
+                    <th>@day.ToString("dd/MM (ddd)")</th>
+                }
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var slot in timeSlots)
+            {
+                var endTime = slot.Add(TimeSpan.FromHours(1)); // mặc định kéo dài 1h, có thể tùy chỉnh
+                                                               <tr>
+                                                                   <th class="bg-light">@slot.ToString(@"hh\:mm") - @endTime.ToString(@"hh\:mm")</th>
+                    @foreach (var day in weekDays)
+                    {
+                        var key = (day.Date, slot);
+                        var schedule = schedules != null && schedules.ContainsKey(key) ? schedules[key] : null;
+                        var currentCount = schedule != null && appointmentCounts.ContainsKey(schedule.Id) ? appointmentCounts[schedule.Id] : 0;
+                        var maxPatients = schedule?.MaxPatients ?? 0;
+                        var slotId = schedule?.Id ?? 0;
+                        <td style="vertical-align: middle;">
+                            @if (schedule != null)
+                            {
+                                <div>Đã đặt: <strong>@currentCount</strong> / @maxPatients</div>
+                                <form asp-action="SaveSlot" method="post" class="mt-2">
+                                    <input type="hidden" name="workDate" value="@day.ToString("yyyy-MM-dd")" />
+                                    <input type="hidden" name="startTime" value="@slot" />
+                                    <input type="hidden" name="endTime" value="@endTime" />
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" name="maxPatients" value="@maxPatients" class="form-control" style="width:60px" min="1" />
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">Cập nhật</button>
+                                    </div>
+                                </form>
+                                <form asp-action="DeleteSlot" method="post" class="mt-1">
+                                    <input type="hidden" name="id" value="@slotId" />
+                                    <input type="hidden" name="workDate" value="@day.ToString("yyyy-MM-dd")" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Xóa lịch này?')">Xóa</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="SaveSlot" method="post">
+                                    <input type="hidden" name="workDate" value="@day.ToString("yyyy-MM-dd")" />
+                                    <input type="hidden" name="startTime" value="@slot" />
+                                    <input type="hidden" name="endTime" value="@endTime" />
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" name="maxPatients" value="5" class="form-control" style="width:60px" placeholder="Số slot" />
+                                        <button type="submit" class="btn btn-sm btn-success">Thêm</button>
+                                    </div>
+                                </form>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<p class="text-muted mt-3">* Mỗi ô đại diện cho một khung giờ trong ngày. Bạn có thể thêm lịch mới bằng cách nhập số bệnh nhân tối đa và bấm "Thêm".</p>

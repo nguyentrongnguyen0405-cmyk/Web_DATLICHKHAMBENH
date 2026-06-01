@@ -1,0 +1,379 @@
+﻿<!-- Chat Widget AI - Hỗ trợ tiếng Việt có dấu/không dấu, trả lời đa dạng -->
+<style>
+    .ai-chat-widget {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 1050;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .ai-chat-button {
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, #0d6efd, #00a1e0);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        transition: all 0.25s ease;
+        color: white;
+        font-size: 28px;
+        border: 2px solid rgba(255,255,255,0.3);
+    }
+
+        .ai-chat-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 28px rgba(13,110,253,0.3);
+        }
+
+    .ai-chat-box {
+        position: absolute;
+        bottom: 84px;
+        right: 0;
+        width: 380px;
+        height: 540px;
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.08);
+    }
+
+        .ai-chat-box.active {
+            display: flex;
+        }
+
+    .ai-chat-header {
+        background: linear-gradient(135deg, #0d6efd, #00a1e0);
+        color: white;
+        padding: 16px 20px;
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .ai-chat-header span {
+            font-size: 1.1rem;
+        }
+
+        .ai-chat-header i {
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+            .ai-chat-header i:hover {
+                opacity: 1;
+            }
+
+    .ai-chat-messages {
+        flex: 1;
+        padding: 16px;
+        overflow-y: auto;
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .ai-message {
+        display: flex;
+        flex-direction: column;
+        max-width: 85%;
+    }
+
+        .ai-message.user {
+            align-self: flex-end;
+        }
+
+        .ai-message.bot {
+            align-self: flex-start;
+        }
+
+        .ai-message .bubble {
+            padding: 10px 14px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .ai-message.user .bubble {
+            background: #0d6efd;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .ai-message.bot .bubble {
+            background: white;
+            color: #1e293b;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+            .ai-message.bot .bubble i {
+                color: #0d6efd;
+                margin-right: 6px;
+            }
+
+    .ai-chat-input {
+        display: flex;
+        gap: 10px;
+        padding: 12px 16px;
+        background: white;
+        border-top: 1px solid #eef2ff;
+    }
+
+        .ai-chat-input input {
+            flex: 1;
+            border: 1px solid #e2e8f0;
+            border-radius: 40px;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+            .ai-chat-input input:focus {
+                border-color: #0d6efd;
+                box-shadow: 0 0 0 2px rgba(13,110,253,0.2);
+            }
+
+        .ai-chat-input button {
+            background: #0d6efd;
+            border: none;
+            color: white;
+            border-radius: 40px;
+            padding: 0 18px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+            .ai-chat-input button:hover {
+                background: #0056b3;
+                transform: scale(0.98);
+            }
+
+    .ai-typing {
+        display: flex;
+        gap: 4px;
+        padding: 8px 12px;
+        background: white;
+        border-radius: 20px;
+        width: fit-content;
+    }
+
+        .ai-typing span {
+            width: 8px;
+            height: 8px;
+            background: #94a3b8;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+            .ai-typing span:nth-child(1) {
+                animation-delay: 0s;
+            }
+
+            .ai-typing span:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+
+            .ai-typing span:nth-child(3) {
+                animation-delay: 0.4s;
+            }
+
+    @@keyframes typing {
+        0%, 60%, 100% {
+            transform: translateY(0);
+            opacity: 0.4;
+        }
+
+        30% {
+            transform: translateY(-6px);
+            opacity: 1;
+        }
+    }
+</style>
+
+<div class="ai-chat-widget">
+    <div class="ai-chat-button" id="aiChatButton">
+        <i class="fas fa-comment-dots"></i>
+    </div>
+    <div class="ai-chat-box" id="aiChatBox">
+        <div class="ai-chat-header">
+            <span><i class="fas fa-robot"></i> Trợ lý AI Y tế</span>
+            <i class="fas fa-times" id="aiChatClose"></i>
+        </div>
+        <div class="ai-chat-messages" id="aiChatMessages">
+            <div class="ai-message bot">
+                <div class="bubble">
+                    <i class="fas fa-stethoscope"></i> Xin chào! Tôi là trợ lý ảo của phòng khám. Bạn có thể hỏi tôi về:<br>
+                    - Đặt lịch khám<br>
+                    - Giá dịch vụ, bác sĩ<br>
+                    - Triệu chứng bệnh<br>
+                    - Giờ làm việc, địa chỉ<br>
+                    - Và nhiều thông tin khác.
+                </div>
+            </div>
+        </div>
+        <div class="ai-chat-input">
+            <input type="text" id="aiChatInput" placeholder="Nhập câu hỏi (có thể không dấu)..." />
+            <button id="aiChatSend">Gửi</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // Hàm chuẩn hóa chuỗi: bỏ dấu, chuyển về chữ thường, loại bỏ khoảng trắng thừa
+        function normalize(str) {
+            if (!str) return '';
+            str = str.toLowerCase().trim();
+            // Bỏ dấu tiếng Việt
+            const accents = 'àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ';
+            const unaccented = 'aaaaaaaaaaaaaaaaaeeeeeeeeeeeiiiiiooooooooooooooooouuuuuuuuuuuyyyyyd';
+            let result = '';
+            for (let i = 0; i < str.length; i++) {
+                let idx = accents.indexOf(str[i]);
+                result += idx !== -1 ? unaccented[idx] : str[i];
+            }
+            return result.replace(/[^a-z0-9\s]/g, '').trim();
+        }
+
+        // Hàm kiểm tra câu hỏi có chứa từ khóa (hỗ trợ normalize)
+        function containsKeyword(question, keywords) {
+            const norm = normalize(question);
+            return keywords.some(kw => norm.includes(normalize(kw)));
+        }
+
+        // Hàm trả lời dựa trên nhiều chủ đề
+        async function getBotReply(question) {
+            const q = question.toLowerCase().trim();
+            const norm = normalize(q);
+
+            // 1. Đặt lịch
+            if (containsKeyword(q, ['dat lich', 'cách đặt lịch', 'đặt lịch thế nào', 'làm sao đặt lịch', 'đặt lịch ở đâu'])) {
+                return "📅 Để đặt lịch khám, bạn vui lòng đăng nhập vào tài khoản (nếu chưa có thì đăng ký). Sau đó vào menu 'Đặt lịch', chọn bác sĩ, ngày khám, khung giờ trống và nhập triệu chứng. Hệ thống sẽ gửi email xác nhận. Rất đơn giản!";
+            }
+            // 2. Giá dịch vụ
+            if (containsKeyword(q, ['giá', 'bao nhiêu', 'phí', 'chi phí', 'giá tiền', 'gia'])) {
+                return "💰 Bảng giá dịch vụ tham khảo:\n- Khám tổng quát: 500.000đ\n- Nhi khoa: 400.000đ\n- Răng hàm mặt: 600.000đ\n- Tim mạch: 700.000đ\n- Xét nghiệm: 300.000đ\n- Tư vấn sức khỏe: Miễn phí\n*Lưu ý: Giá có thể thay đổi tùy gói dịch vụ, vui lòng xem chi tiết trong mục 'Dịch vụ'.";
+            }
+            // 3. Bác sĩ
+            if (containsKeyword(q, ['bác sĩ', 'bac si', 'bs', 'bác sỹ', 'chuyên khoa', 'bác sĩ nào', 'bác sĩ giỏi'])) {
+                return "👨‍⚕️ Đội ngũ bác sĩ của chúng tôi:\n- PGS.TS.BS Nguyễn Văn An (Nội tổng quát, 15 năm kinh nghiệm)\n- TS.BS Trần Thị Bích (Nhi khoa, 12 năm kinh nghiệm)\n- BS.CKII Lê Văn Cường (Răng hàm mặt, 10 năm kinh nghiệm)\n- TS.BS Phạm Minh Tuấn (Tim mạch, 12 năm kinh nghiệm)\n- ThS.BS Nguyễn Thị Hương (Xét nghiệm, 8 năm kinh nghiệm)\n- CN. Dương Thị Lan (Tư vấn dinh dưỡng, 7 năm kinh nghiệm)";
+            }
+            // 4. Triệu chứng (đau đầu, sốt, ho, đau bụng...)
+            if (containsKeyword(q, ['đau đầu', 'dau dau', 'nhức đầu', 'chóng mặt', 'hoa mắt'])) {
+                return "🤕 Đau đầu có thể do nhiều nguyên nhân: căng thẳng, thiếu ngủ, huyết áp, hoặc bệnh lý thần kinh. Nếu kéo dài, bạn nên đặt lịch khám tổng quát hoặc chuyên khoa Thần kinh (chúng tôi có bác sĩ Nguyễn Văn An).";
+            }
+            if (containsKeyword(q, ['sốt', 'hot', 'sot', 'nóng', 'sốt cao'])) {
+                return "🌡️ Sốt là phản ứng của cơ thể chống lại nhiễm trùng. Bạn nên nghỉ ngơi, uống nhiều nước, dùng thuốc hạ sốt nếu cần. Nếu sốt cao trên 39°C kéo dài hoặc kèm triệu chứng nặng, hãy đến khám ngay. Đặt lịch qua web để được tư vấn.";
+            }
+            if (containsKeyword(q, ['ho', 'ho khan', 'ho dai dẳng', 'ho đờm'])) {
+                return "😷 Ho có thể do viêm họng, viêm phế quản, hoặc dị ứng. Uống nhiều nước ấm, súc miệng nước muối. Nếu ho kéo dài hơn 2 tuần, hãy đặt lịch khám Nội hô hấp.";
+            }
+            if (containsKeyword(q, ['đau bụng', 'dau bung', 'đau dạ dày', 'đau bao tử'])) {
+                return "🍽️ Đau bụng có thể do rối loạn tiêu hóa, viêm dạ dày, hoặc sỏi mật. Nếu đau dữ dội hoặc kèm sốt, nôn, hãy đi khám ngay. Chúng tôi có bác sĩ chuyên khoa Tiêu hóa.";
+            }
+            if (containsKeyword(q, ['khó thở', 'kho tho', 'thở khò khè', 'hen suyễn'])) {
+                return "🫁 Khó thở là dấu hiệu cần được thăm khám sớm, đặc biệt nếu bạn có tiền sử hen suyễn, bệnh phổi. Hãy đặt lịch khám Tim mạch hoặc Hô hấp ngay.";
+            }
+            // 5. Giờ làm việc, địa chỉ
+            if (containsKeyword(q, ['giờ làm việc', 'gio lam viec', 'thời gian làm việc', 'khung giờ', 'mấy giờ'])) {
+                return "⏰ Phòng khám hoạt động:\n- Thứ 2 - Thứ 7: 7:30 - 17:30\n- Nghỉ Chủ nhật và các ngày lễ.\n- Đặt lịch trước qua web để được ưu tiên.";
+            }
+            if (containsKeyword(q, ['địa chỉ', 'dia chi', 'ở đâu', 'đường', 'phòng khám ở đâu', 'chi nhánh'])) {
+                return "📍 Địa chỉ: 123 Đường Nguyễn Trãi, Quận 1, TP. Hồ Chí Minh. (Gần ngã tư Nguyễn Trãi - Lê Lợi, đối diện công viên 30/4). Bạn có thể dùng Google Maps để chỉ đường.";
+            }
+            // 6. Hỗ trợ, tư vấn
+            if (containsKeyword(q, ['hotline', 'số điện thoại', 'điện thoại', 'liên hệ', 'contact'])) {
+                return "📞 Hotline tư vấn miễn phí: 1900 1717 (24/7). Bạn cũng có thể gửi câu hỏi qua email: info@phongkham.com. Chúng tôi sẽ phản hồi sớm nhất.";
+            }
+            // 7. Thanh toán, hóa đơn
+            if (containsKeyword(q, ['thanh toán', 'hóa đơn', 'tiền', 'thuốc', 'đơn thuốc', 'xuất hóa đơn'])) {
+                return "💵 Thanh toán có thể bằng tiền mặt khi khám hoặc chuyển khoản. Hóa đơn điện tử được xuất sau khi thanh toán và gửi qua email (nếu có yêu cầu). Bạn cũng có thể xem hóa đơn trong mục 'Lịch hẹn của tôi'.";
+            }
+            // 8. Lịch sử khám, hồ sơ bệnh án
+            if (containsKeyword(q, ['lịch sử khám', 'lich su', 'bệnh án', 'hồ sơ', 'kết quả khám'])) {
+                return "📋 Để xem lịch sử khám và hồ sơ bệnh án, bạn đăng nhập vào tài khoản của mình, vào menu 'Lịch sử khám' hoặc 'Hồ sơ bệnh án'. Tại đó bạn có thể xem chi tiết các lần khám trước và đơn thuốc.";
+            }
+            // 9. Quên mật khẩu
+            if (containsKeyword(q, ['quên mật khẩu', 'quen mat khau', 'lấy lại mật khẩu', 'đặt lại mật khẩu'])) {
+                return "🔐 Nếu bạn quên mật khẩu, hãy bấm vào 'Quên mật khẩu?' trên trang đăng nhập, nhập email đã đăng ký. Chúng tôi sẽ gửi hướng dẫn đặt lại mật khẩu qua email. Bạn cũng có thể liên hệ hotline 1900 1717 để được hỗ trợ.";
+            }
+            // 10. Cảm ơn, chào hỏi
+            if (containsKeyword(q, ['cảm ơn', 'cam on', 'thanks', 'thank'])) {
+                return "🙏 Rất vui được giúp bạn! Nếu còn thắc mắc gì, hãy hỏi nhé. Chúc bạn sức khỏe!";
+            }
+            if (containsKeyword(q, ['chào', 'hi', 'hello', 'xin chào', 'alo'])) {
+                return "👋 Xin chào bạn! Tôi là trợ lý ảo của phòng khám. Bạn cần tôi hỗ trợ gì ạ? (Ví dụ: đặt lịch, giá dịch vụ, triệu chứng...)";
+            }
+            // 11. Mẹo vặt, lời khuyên chung
+            if (containsKeyword(q, ['lời khuyên', 'meo', 'sức khỏe', 'healthy', 'chế độ ăn', 'tập thể dục'])) {
+                return "🥗 Lời khuyên sức khỏe: Uống đủ 2 lít nước mỗi ngày, ngủ đủ 7-8 tiếng, tập thể dục thường xuyên, hạn chế đồ ngọt và thức khuya. Khám sức khỏe định kỳ 6 tháng/lần để phát hiện sớm bệnh.";
+            }
+
+            // Mặc định: gợi ý
+            return "📌 Xin lỗi, tôi chưa hiểu rõ câu hỏi của bạn. Bạn có thể thử hỏi:\n- Đặt lịch khám như thế nào?\n- Giá dịch vụ ra sao?\n- Bác sĩ nào khám tim mạch?\n- Địa chỉ phòng khám ở đâu?\n- Tôi bị đau đầu nên làm gì?\nHoặc liên hệ hotline 1900 1717 để được tư vấn trực tiếp.";
+        }
+
+        // DOM elements
+        const chatButton = document.getElementById('aiChatButton');
+        const chatBox = document.getElementById('aiChatBox');
+        const chatClose = document.getElementById('aiChatClose');
+        const chatMessages = document.getElementById('aiChatMessages');
+        const chatInput = document.getElementById('aiChatInput');
+        const chatSend = document.getElementById('aiChatSend');
+
+        chatButton.addEventListener('click', () => chatBox.classList.add('active'));
+        chatClose.addEventListener('click', () => chatBox.classList.remove('active'));
+
+        function addMessage(text, isUser) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `ai-message ${isUser ? 'user' : 'bot'}`;
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            if (!isUser) bubble.innerHTML = `<i class="fas fa-robot"></i> ${text}`;
+            else bubble.innerText = text;
+            msgDiv.appendChild(bubble);
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showTyping() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'ai-message bot';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `<div class="ai-typing"><span></span><span></span><span></span></div>`;
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeTyping() {
+            const typing = document.getElementById('typingIndicator');
+            if (typing) typing.remove();
+        }
+
+        async function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+            addMessage(text, true);
+            chatInput.value = '';
+            showTyping();
+            // Mô phỏng thời gian trả lời
+            const reply = await getBotReply(text);
+            removeTyping();
+            addMessage(reply, false);
+        }
+
+        chatSend.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+    })();
+</script>

@@ -1,13 +1,52 @@
-# Visual Studio
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+<<<<<<< HEAD
+    <Nullable>enable</Nullable>     <!-- ĐÃ SỬA: enable để dùng nullable reference types -->
+=======
+    <Nullable>enable</Nullable>
+>>>>>>> 2bcbeb4fc07ab885aa0418bc8f8ffda973bdcda7
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Web_Đặt_lịch_phòng_khám</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+<<<<<<< HEAD
+    <PackageReference Include="MailKit" Version="4.15.1" />
+=======
+>>>>>>> 2bcbeb4fc07ab885aa0418bc8f8ffda973bdcda7
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+<<<<<<< HEAD
+    <PackageReference Include="QRCoder" Version="1.7.0" />
+  </ItemGroup>
+
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties appsettings_1json__JsonSchema="https://www.schemastore.org/appsscript.json" />
+    </VisualStudio>
+  </ProjectExtensions>
+
+</Project>
+=======
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="https://www.schemastore.org/appsscript.json" /></VisualStudio></ProjectExtensions>
+
+</Project>
+>>>>>>> 2bcbeb4fc07ab885aa0418bc8f8ffda973bdcda7
+
+[Bb]in/
+[Oo]bj/
 .vs/
 *.user
-*.suo
-*.cache
-
-# Build output
-bin/
-obj/
-
-# File tạm
-*.log
-*.tmp

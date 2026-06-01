@@ -1,0 +1,208 @@
+﻿@{
+    ViewData["Title"] = "Dashboard Admin";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .admin-wrapper {
+        display: flex;
+        gap: 24px;
+        margin-top: 20px;
+    }
+
+    .admin-sidebar {
+        width: 280px;
+        background: #f8fafc;
+        border-radius: 28px;
+        padding: 24px 0;
+        box-shadow: 0 15px 35px -10px rgba(0,0,0,0.05);
+        height: fit-content;
+        position: sticky;
+        top: 20px;
+    }
+
+        .admin-sidebar .menu-item {
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+            margin: 6px 0;
+            border-radius: 0 12px 12px 0;
+            text-decoration: none;
+        }
+
+            .admin-sidebar .menu-item i {
+                width: 32px;
+                font-size: 1.2rem;
+                text-align: center;
+            }
+
+            .admin-sidebar .menu-item:hover, .admin-sidebar .menu-item.active {
+                background: #e6f0ff;
+                color: #0d6efd;
+                border-left-color: #0d6efd;
+            }
+
+    .admin-content {
+        flex: 1;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 24px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+        border: 1px solid #f0f2f5;
+        transition: all 0.25s;
+        text-align: center;
+        height: 100%;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 25px -10px rgba(0,0,0,0.1);
+        }
+
+        .stat-card .stat-icon {
+            width: 54px;
+            height: 54px;
+            background: linear-gradient(145deg, #eef2ff, #ffffff);
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+    .top-card {
+        background: white;
+        border-radius: 24px;
+        padding: 20px;
+        border: 1px solid #f0f2f5;
+        box-shadow: 0 5px 12px rgba(0,0,0,0.02);
+        height: 100%;
+    }
+
+    .greeting-banner {
+        background: linear-gradient(105deg, #0d6efd 0%, #00a1e0 100%);
+        border-radius: 28px;
+        padding: 20px 28px;
+        margin-bottom: 28px;
+        color: white;
+    }
+
+    .badge-rank {
+        background: #ffeed9;
+        color: #b45309;
+        padding: 4px 12px;
+        border-radius: 40px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    @@media (max-width: 768px) {
+        .admin-wrapper {
+            flex-direction: column;
+        }
+
+        .admin-sidebar {
+            width: 100%;
+            position: static;
+        }
+    }
+</style>
+
+<div class="admin-wrapper">
+    <!-- Sidebar -->
+    <div class="admin-sidebar">
+        <a href="/Admin" class="menu-item active">
+            <i class="fas fa-chart-line"></i> <span>Dashboard</span>
+        </a>
+        <a href="/Admin/Users" class="menu-item">
+            <i class="fas fa-users"></i> <span>Người dùng</span>
+        </a>
+        <a href="/Admin/Doctors" class="menu-item">
+            <i class="fas fa-user-md"></i> <span>Bác sĩ</span>
+        </a>
+        <a href="/Admin/Specialties" class="menu-item">
+            <i class="fas fa-stethoscope"></i> <span>Chuyên khoa</span>
+        </a>
+        <a href="/Admin/Revenue" class="menu-item">
+            <i class="fas fa-chart-simple"></i> <span>Doanh thu</span>
+        </a>
+        <div class="menu-divider" style="height:1px; background:#eef2ff; margin:12px 20px;"></div>
+        <a href="#" class="menu-item">
+            <i class="fas fa-cog"></i> <span>Cài đặt</span>
+        </a>
+    </div>
+
+    <!-- Nội dung chính -->
+    <div class="admin-content">
+        <div class="greeting-banner">
+            <h3 class="fw-bold mb-1">📊 Chào mừng, Admin!</h3>
+            <p class="mb-0 opacity-75">Hôm nay là @DateTime.Now.ToString("dd/MM/yyyy") - Dưới đây là tổng quan hệ thống</p>
+        </div>
+
+        <!-- 4 thẻ thống kê -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-users fa-2x text-primary"></i></div>
+                    <h2 class="fw-bold mb-0">@ViewBag.UserCount</h2>
+                    <p class="text-muted mb-0">Bệnh nhân</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-user-md fa-2x text-primary"></i></div>
+                    <h2 class="fw-bold mb-0">@ViewBag.DoctorCount</h2>
+                    <p class="text-muted mb-0">Bác sĩ</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-calendar-day fa-2x text-primary"></i></div>
+                    <h2 class="fw-bold mb-0">@ViewBag.AppointmentCount</h2>
+                    <p class="text-muted mb-0">Lịch hẹn</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-stethoscope fa-2x text-primary"></i></div>
+                    <h2 class="fw-bold mb-0">@ViewBag.SpecialtyCount</h2>
+                    <p class="text-muted mb-0">Chuyên khoa</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top bác sĩ và tư vấn viên -->
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="top-card d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="badge-rank mb-2"><i class="fas fa-trophy me-1"></i> Bác sĩ được đặt lịch nhiều nhất</div>
+                        <h4 class="fw-bold mb-1">@ViewBag.TopDoctor</h4>
+                        <p class="text-muted mb-0">@ViewBag.TopDoctorCount lượt đặt</p>
+                    </div>
+                    <i class="fas fa-chart-simple fa-3x text-primary opacity-50"></i>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="top-card d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="badge-rank mb-2"><i class="fas fa-pen-fancy me-1"></i> Tư vấn viên tích cực nhất</div>
+                        <h4 class="fw-bold mb-1">@ViewBag.TopConsultant</h4>
+                        <p class="text-muted mb-0">Chưa có dữ liệu bài viết</p>
+                    </div>
+                    <i class="fas fa-user-edit fa-3x text-primary opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

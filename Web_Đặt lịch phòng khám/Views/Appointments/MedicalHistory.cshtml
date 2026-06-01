@@ -1,0 +1,66 @@
+﻿@model IEnumerable<Web_Đặt_lịch_phòng_khám.Models.Appointment>
+@{
+    ViewData["Title"] = "Lịch sử khám bệnh";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (!Model.Any())
+{
+    <p>Bạn chưa có lịch sử khám bệnh.</p>
+}
+else
+{
+    <div class="accordion" id="historyAccordion">
+        @foreach (var item in Model)
+        {
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading_@item.Id">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_@item.Id" aria-expanded="false" aria-controls="collapse_@item.Id">
+                        <strong>@item.Schedule?.WorkDate.ToString("dd/MM/yyyy")</strong> - @item.Doctor?.FullName (@item.Doctor?.Specialty?.Name)
+                    </button>
+                </h2>
+                <div id="collapse_@item.Id" class="accordion-collapse collapse" aria-labelledby="heading_@item.Id" data-bs-parent="#historyAccordion">
+                    <div class="accordion-body">
+                        <p><strong>Triệu chứng:</strong> @item.Symptoms</p>
+                        <p><strong>Trạng thái:</strong> @item.Status</p>
+                        @if (item.MedicalRecord != null)
+                        {
+                            <hr />
+                            <h5>Hồ sơ bệnh án</h5>
+                            <p><strong>Chẩn đoán:</strong> @item.MedicalRecord.Diagnosis</p>
+                            <p><strong>Kết quả khám:</strong> @item.MedicalRecord.ExaminationResult</p>
+                            <p><strong>Ghi chú:</strong> @item.MedicalRecord.Notes</p>
+
+                            @if (item.MedicalRecord.Prescriptions != null && item.MedicalRecord.Prescriptions.Any())
+                            {
+                                <h5>Đơn thuốc</h5>
+                                <table class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr><th>Tên thuốc</th><th>Liều lượng</th><th>Hướng dẫn</th><th>Số lượng</th><th>Đơn vị</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var pres in item.MedicalRecord.Prescriptions)
+                                        {
+                                            <tr>
+                                                <td>@(pres.Medicine?.Name ?? "N/A")</td
+                                                <td>@pres.Dosage</td
+                                                <td>@pres.Instructions</td
+                                                <td>@pres.Quantity</td
+                                                <td>@pres.Unit</td
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted">Chưa có hồ sơ bệnh án.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

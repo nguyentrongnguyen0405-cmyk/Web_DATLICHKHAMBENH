@@ -13,5 +13,7 @@ namespace Web_Đặt_lịch_phòng_khám.Models
         public TimeSpan EndTime { get; set; }
         public int SlotDuration { get; set; } = 60;
         public bool IsActive { get; set; } = true;
+        public int MaxPatients { get; set; } = 5;
+       
     }
 }

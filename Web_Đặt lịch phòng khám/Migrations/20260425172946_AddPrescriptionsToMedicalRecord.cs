@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Web_Đặt_lịch_phòng_khám.Migrations
 {
     /// <inheritdoc />
-    public partial class FixCascadeLoi : Migration
+    public partial class AddPrescriptionsToMedicalRecord : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,8 +31,12 @@ namespace Web_Đặt_lịch_phòng_khám.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Role = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AvatarUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -59,8 +63,15 @@ namespace Web_Đặt_lịch_phòng_khám.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Price = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ShortDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FullDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Features = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Tests = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Benefits = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -180,9 +191,9 @@ namespace Web_Đặt_lịch_phòng_khám.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Qualifications = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Qualifications = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ExperienceYears = table.Column<int>(type: "int", nullable: false),
-                    ConsultationFee = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ConsultationFee = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     SpecialtyId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
@@ -223,7 +234,7 @@ namespace Web_Đặt_lịch_phòng_khám.Migrations
                         column: x => x.DoctorId,
                         principalTable: "Doctors",
                         principalColumn: "Id",
-                      onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -232,12 +243,15 @@ namespace Web_Đặt_lịch_phòng_khám.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DoctorId = table.Column<int>(type: "int", nullable: false),
                     ScheduleId = table.Column<int>(type: "int", nullable: false),
-                    Symptoms = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Symptoms = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConsultationFee = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -246,19 +260,66 @@ namespace Web_Đặt_lịch_phòng_khám.Migrations
                         name: "FK_Appointments_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Appointments_Doctors_DoctorId",
                         column: x => x.DoctorId,
                         principalTable: "Doctors",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Appointments_Schedules_ScheduleId",
                         column: x => x.ScheduleId,
                         principalTable: "Schedules",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MedicalRecords",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AppointmentId = table.Column<int>(type: "int", nullable: false),
+                    Diagnosis = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExaminationResult = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MedicalRecords", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MedicalRecords_Appointments_AppointmentId",
+                        column: x => x.AppointmentId,
+                        principalTable: "Appointments",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Prescriptions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MedicalRecordId = table.Column<int>(type: "int", nullable: false),
+                    MedicineName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Dosage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Instructions = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Unit = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Prescriptions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Prescriptions_MedicalRecords_MedicalRecordId",
+                        column: x => x.MedicalRecordId,
+                        principalTable: "MedicalRecords",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -326,6 +387,17 @@ namespace Web_Đặt_lịch_phòng_khám.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_MedicalRecords_AppointmentId",
+                table: "MedicalRecords",
+                column: "AppointmentId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Prescriptions_MedicalRecordId",
+                table: "Prescriptions",
+                column: "MedicalRecordId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Schedules_DoctorId",
                 table: "Schedules",
                 column: "DoctorId");
@@ -334,9 +406,6 @@ namespace Web_Đặt_lịch_phòng_khám.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Appointments");
-
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -353,10 +422,19 @@ namespace Web_Đặt_lịch_phòng_khám.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Schedules");
+                name: "Prescriptions");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "MedicalRecords");
+
+            migrationBuilder.DropTable(
+                name: "Appointments");
+
+            migrationBuilder.DropTable(
+                name: "Schedules");
 
             migrationBuilder.DropTable(
                 name: "Doctors");

@@ -9,6 +9,7 @@ namespace Web_Đặt_lịch_phòng_khám.Models
         [Key]
         public int Id { get; set; }
 
+
         public string UserId { get; set; } = string.Empty;
         [ForeignKey("UserId")]
         public virtual ApplicationUser? User { get; set; }
@@ -24,5 +25,10 @@ namespace Web_Đặt_lịch_phòng_khám.Models
         public string Symptoms { get; set; } = string.Empty;
         public string Status { get; set; } = "pending"; // pending, confirmed, cancelled
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        public string? PaymentMethod { get; set; }
+        public string? PaymentStatus { get; set; }
+        public decimal? ConsultationFee { get; set; }
+        public virtual MedicalRecord? MedicalRecord { get; set; }
     }
 }
